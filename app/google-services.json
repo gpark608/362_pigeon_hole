@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "993284134157",
+    "project_id": "minerva-fab8b",
+    "storage_bucket": "minerva-fab8b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993284134157:android:baac1efcc39ce26e700c44",
+        "android_client_info": {
+          "package_name": "ca.sfu.minerva"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993284134157-tdo2iahu2ct6j8vlrd2d6ptkc72q87pr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQriLJ0G384Xx-znouVezU2kGlJvXgAYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993284134157-tdo2iahu2ct6j8vlrd2d6ptkc72q87pr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
