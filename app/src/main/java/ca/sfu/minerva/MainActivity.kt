@@ -29,7 +29,9 @@ class MainActivity : AppCompatActivity() {
         auth = Firebase.auth
 
         btnLogin.setOnClickListener {
-            login()
+//            login()
+            val intent = Intent(this, BikeMapActivity::class.java)
+            startActivity(intent)
         }
 
         btnRegister.setOnClickListener {

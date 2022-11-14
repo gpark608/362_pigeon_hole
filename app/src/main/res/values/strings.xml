@@ -6,4 +6,5 @@
     <string name="label_register">Register</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_bike_map">BikeMapActivity</string>
 </resources>
