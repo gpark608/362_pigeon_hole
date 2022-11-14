@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
-@Database(entities = [RecyclingCenter::class, EcoStore::class, BikeRentalPlace::class, BikeTrail::class, BikeRepairShop::class], version = 1)
+@Database(entities = [RecyclingCenter::class, EcoStore::class, BikeRentalPlace::class, BikeTrail::class, BikeRepairShop::class, BikeLocation::class], version = 1)
+@TypeConverters(MinervaDataConverter::class)
 abstract class MinervaDatabase : RoomDatabase() {
     abstract val MinervaDatabaseDao : MinervaDatabaseDao
 
