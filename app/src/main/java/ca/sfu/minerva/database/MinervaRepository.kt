@@ -3,14 +3,15 @@ package ca.sfu.minerva.database
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 
 class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
-    val BikeRentalPlaceData = databaseDao.getAllBikeRentalPlaces()
-    val BikeRepairShopData = databaseDao.getAllBikeRepairShops()
-    val BikeTrailData = databaseDao.getAllBikeTrails()
-    val EcoStoreData = databaseDao.getAllEcoStores()
-    val RecyclingCenterData = databaseDao.getAllRecyclingCenters()
-
+    val BikeRentalPlaceData: Flow<List<BikeRentalPlace>> = databaseDao.getAllBikeRentalPlaces()
+    val BikeRepairShopData: Flow<List<BikeRepairShop>> = databaseDao.getAllBikeRepairShops()
+    val BikeTrailData: Flow<List<BikeTrail>> = databaseDao.getAllBikeTrails()
+    val EcoStoreData: Flow<List<EcoStore>> = databaseDao.getAllEcoStores()
+    val RecyclingCenterData: Flow<List<RecyclingCenter>> = databaseDao.getAllRecyclingCenters()
+    val BikeLocationData: Flow<List<BikeLocation>> = databaseDao.getAllBikeLocation()
 
     fun insertBikeRentalPlace(data: BikeRentalPlace){
         CoroutineScope(IO).launch {
@@ -42,7 +43,13 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
         }
     }
 
+    fun insertBikeLocation(data: BikeLocation){
+        CoroutineScope(IO).launch {
+            databaseDao.insertBikeLocation(data)
+        }
+    }
 
+//    ----
     fun getBikeRentalPlace(id: Long): BikeRentalPlace{
         var result: BikeRentalPlace = BikeRentalPlace()
         CoroutineScope(IO).launch {
@@ -83,4 +90,11 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
         return result
     }
 
+    fun getBikeLocation(id: Long): BikeLocation{
+        var result: BikeLocation = BikeLocation()
+        CoroutineScope(IO).launch {
+            result = databaseDao.getBikeLocationFromKey(id)
+        }
+        return result
+    }
 }
