@@ -21,10 +21,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        emailET = findViewById(R.id.email)
-        passwordET = findViewById(R.id.password)
-        btnLogin = findViewById(R.id.btnLogin)
-        btnRegister = findViewById(R.id.btnRegister)
+        emailET = findViewById(R.id.editTextEmail)
+        passwordET = findViewById(R.id.editTextPassword)
+        btnLogin = findViewById(R.id.buttonLogin)
+        btnRegister = findViewById(R.id.buttonRegister)
 
         auth = Firebase.auth
 
