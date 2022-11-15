@@ -3,6 +3,7 @@ package ca.sfu.minerva
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
@@ -13,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import ca.sfu.minerva.database.BikeRack
-import ca.sfu.minerva.database.BikeTheft
 import ca.sfu.minerva.databinding.ActivityBikeMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -21,6 +21,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
+import com.google.maps.android.heatmaps.Gradient
+import com.google.maps.android.heatmaps.HeatmapTileProvider
+import com.google.maps.android.heatmaps.WeightedLatLng
+
 
 class BikeMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener  {
 
@@ -32,7 +36,9 @@ class BikeMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListene
     private lateinit var markerOptions: MarkerOptions
     private lateinit var mClusterManager: ClusterManager<BikeRack>
     private lateinit var bikeRacks: ArrayList<BikeRack>
-    private lateinit var bikeThefts: ArrayList<BikeTheft>
+    private lateinit var bikeThefts: ArrayList<WeightedLatLng>
+    private lateinit var mProvider: HeatmapTileProvider
+    private lateinit var mOverlay: TileOverlay
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,13 +69,39 @@ class BikeMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListene
         fakeBikeRackList()
         fakeBikeTheftList()
 
-        addToMap()
+        addBikeRacks()
+        addBikeTheft()
     }
 
-    private fun addToMap() {
+    private fun addBikeRacks() {
         runOnUiThread{
             mClusterManager.addItems(bikeRacks)
             mClusterManager.cluster()
+        }
+    }
+
+    private fun addBikeTheft() {
+        runOnUiThread{
+            val colors = intArrayOf(
+                Color.rgb(101, 38, 178), //Purpleish
+                Color.rgb(51, 86, 255), //Blueish
+                Color.GREEN,
+                Color.YELLOW,
+                Color.rgb(255,165,0), //Orangeish
+                Color.RED,
+            )
+
+            val startPoints = floatArrayOf(
+                0.1f, 0.2f, 0.3f, 0.4f, 0.6f, 1.0f
+            )
+
+            val gradient = Gradient(colors, startPoints)
+
+            mProvider = HeatmapTileProvider.Builder()
+                .weightedData(bikeThefts).radius(30).gradient(gradient).opacity(0.5)
+                .build()
+
+            mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))!!
         }
     }
 
@@ -77,17 +109,17 @@ class BikeMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListene
     private fun fakeBikeRackList(){
         bikeRacks = ArrayList()
         for (i in 0..9) {
-            val latLng = LatLng((49.267502010791375 + (i * 0.001)).toDouble(), (-123.00311497930385 + (i * 0.001)).toDouble())
+            val latLng = LatLng((49.267502010791375 + i * 0.001 * (0..5).random()), (-123.00311497930385 + i * 0.001 * (0..5).random()))
             bikeRacks.add(BikeRack(latLng))
         }
     }
 
     private fun fakeBikeTheftList(){
         bikeThefts = ArrayList()
-        val bt1 = BikeTheft(LatLng(49.267221975231465, -123.01393841745823))
-        val bt2 = BikeTheft(LatLng(49.26713096333225, -123.01436488868474))
-        bikeThefts.add(bt1)
-        bikeThefts.add(bt2)
+        for (i in 0..9) {
+            val latLng = LatLng((49.267502010791375 + (i * 0.0001 * (0..5).random())), (-123.00311497930385 + (i * 0.0001 * (0..5).random())))
+            bikeThefts.add(WeightedLatLng(latLng, (0..10).random().toDouble()))
+        }
     }
 
     /*
