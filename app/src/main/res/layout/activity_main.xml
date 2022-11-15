@@ -81,7 +81,7 @@
             android:orientation="horizontal">
 
             <View
-                android:id="@+id/first_divider"
+                android:id="@+id/firstDivider"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1"
@@ -90,7 +90,7 @@
                 android:background="@color/ghost_white"/>
 
             <TextView
-                android:id="@+id/text"
+                android:id="@+id/or"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_medium"
@@ -100,7 +100,7 @@
                 tools:ignore="TextContrastCheck" />
 
             <View
-                android:id="@+id/second_divider"
+                android:id="@+id/secondDivider"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1"
@@ -111,6 +111,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/textViewGuest"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginTop="20dp"
