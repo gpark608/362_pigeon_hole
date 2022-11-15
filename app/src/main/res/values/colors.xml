@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Custom Colors -->
+    <color name="ocean_green">#1DB162</color>
+    <color name="grey">#494B5A</color>
+    <color name="baby_powder">#FDFFFC</color>
+    <color name="ghost_white">#9D9D9D</color>
+    <color name="raisin_black">#1F1F22</color>
 </resources>
