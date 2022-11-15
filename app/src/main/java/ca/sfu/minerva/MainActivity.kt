@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var passwordET: EditText
     private lateinit var btnLogin: Button
     private lateinit var btnRegister: Button
+    private lateinit var btnContinue: TextView
 
     private val requestCode = 200
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         passwordET = findViewById(R.id.editTextPassword)
         btnLogin = findViewById(R.id.buttonLogin)
         btnRegister = findViewById(R.id.buttonRegister)
+        btnContinue = findViewById(R.id.textViewGuest)
 
         auth = Firebase.auth
 
@@ -40,6 +43,10 @@ class MainActivity : AppCompatActivity() {
         btnRegister.setOnClickListener {
             register()
         }
+
+        btnContinue.setOnClickListener {
+            startMapsActivity()
+        }
     }
 
     private fun login() {
@@ -49,8 +56,7 @@ class MainActivity : AppCompatActivity() {
         val pass = "qwerty123"
         auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
             if (it.isSuccessful) {
-                val intent = Intent(this, MapsActivity::class.java)
-                startActivity(intent)
+                startMapsActivity()
             } else
                 Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show()
         }
@@ -68,8 +74,7 @@ class MainActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
             if (it.isSuccessful) {
                 Toast.makeText(this, "Account Created", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, MapsActivity::class.java)
-                startActivity(intent)
+                startMapsActivity()
             } else {
                 Toast.makeText(this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show()
             }
@@ -108,5 +113,9 @@ class MainActivity : AppCompatActivity() {
             println("debug: permission denied")
             checkPermission(this)
         }
+    }
+    private fun startMapsActivity () {
+        val intent = Intent(this, MapsActivity::class.java)
+        startActivity(intent)
     }
 }
