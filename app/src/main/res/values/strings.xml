@@ -12,4 +12,5 @@
     <string name="label_register">Register</string>
     <string name="label_log_in_action">Log in</string>
     <string name="label_or">or</string>
+    <string name="continue_as_guest">Continue as Guest</string>
 </resources>

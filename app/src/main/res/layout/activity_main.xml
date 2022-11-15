@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="60dp">
@@ -60,6 +61,7 @@
             android:id="@+id/buttonLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
             android:fontFamily="@font/roboto_medium"
             android:text="@string/label_log_in_action"
             android:textAllCaps="false" />
@@ -68,6 +70,7 @@
             android:id="@+id/buttonRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:fontFamily="@font/roboto_medium"
             android:text="@string/label_register"
             android:textAllCaps="false" />
@@ -75,7 +78,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
             android:orientation="horizontal">
 
             <View
@@ -91,10 +93,11 @@
                 android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/ghost_white"
-                android:textAllCaps="true"
                 android:fontFamily="@font/roboto_medium"
-                android:text="@string/label_or"/>
+                android:text="@string/label_or"
+                android:textAllCaps="true"
+                android:textColor="@color/ghost_white"
+                tools:ignore="TextContrastCheck" />
 
             <View
                 android:id="@+id/second_divider"
@@ -107,7 +110,15 @@
 
         </LinearLayout>
 
-        <!-- Will Add Google Sign in Here -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="@color/ghost_white"
+            android:text="@string/continue_as_guest"
+            />
 
     </LinearLayout>
 
