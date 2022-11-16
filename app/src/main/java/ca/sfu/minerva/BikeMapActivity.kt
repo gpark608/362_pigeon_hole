@@ -2,6 +2,7 @@ package ca.sfu.minerva
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Criteria
@@ -10,6 +11,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -54,6 +56,12 @@ class BikeMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListene
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        // Temporary code which makes an intent for Favourite POI activity
+        findViewById<Button>(R.id.buttonFavourites).setOnClickListener {
+            val favouritesIntent = Intent(this, FavouritePoiActivity::class.java)
+            startActivity(favouritesIntent)
+        }
 
     }
 
