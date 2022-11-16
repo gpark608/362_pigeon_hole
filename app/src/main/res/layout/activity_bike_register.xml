@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="50dp"
+    android:orientation="vertical"
+    tools:context=".BikeRegisterActivity">
+
+    <ImageView
+        android:id="@+id/imageViewProject529"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginBottom="20dp"
+        android:layout_gravity="center"
+        tools:srcCompat="@drawable/project_529_logo"
+        android:contentDescription="@string/project_529_logo_desc" />
+
+    <TextView
+        android:id="@+id/textViewCallToAction1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/cta1"
+        android:textAlignment="center"
+        android:textColor="@color/raisin_black"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textViewCallToAction2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="@string/cta2"
+        android:textAlignment="center"
+        android:textColor="@color/raisin_black"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textViewProject529Description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/raisin_black"
+        android:elegantTextHeight="true"
+        android:text="@string/project_529_desc" />
+
+    <Button
+        android:id="@+id/buttonRegisterProject529"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/label_register" />
+
+    <Button
+        android:id="@+id/buttonLater"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:text="@string/label_later" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

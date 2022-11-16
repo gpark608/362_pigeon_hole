@@ -1,6 +1,8 @@
 package ca.sfu.minerva
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
@@ -33,7 +35,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
     private lateinit var repository: MinervaRepository
     private lateinit var viewModelFactory: MinervaViewModelFactory
     private lateinit var viewModel: MinervaViewModel
-//
+
+    private lateinit var sharedPreferences: SharedPreferences
 
     private var bikeMarkerPresent = false
 
@@ -58,10 +61,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
         viewModel = ViewModelProvider(this, viewModelFactory)[MinervaViewModel::class.java]
         viewModel.BikeLocationDataLive.observe(this, Observer {})
 
-
-
+        // Use Shared Preferences to determine whether user is prompted to register with Project 529
+        sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+        promptBikeRegistration()
     }
-
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -138,6 +141,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
         menuInflater.inflate(R.menu.menu, menu)
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem)= when (item.itemId) {
         R.id.item1 -> {
             // User chose the "Settings" item, show the app settings UI...
@@ -157,6 +161,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun promptBikeRegistration() {
+        val isBikeRegistered = sharedPreferences.getBoolean("registered", false)
+
+        if (!isBikeRegistered) {
+            val intent = Intent(this, BikeRegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 }
