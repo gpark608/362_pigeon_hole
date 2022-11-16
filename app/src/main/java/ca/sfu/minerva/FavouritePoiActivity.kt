@@ -18,6 +18,7 @@ import ca.sfu.minerva.databinding.ActivityFavouritePoiBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -32,14 +33,20 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
     private lateinit var poiListAdapter: PoiListAdapter
     private lateinit var poiMarker: Marker
     private lateinit var locationManager:  LocationManager
-    private val optionList: List<String> = listOf("Work", "Favourite", "Destination", "Home", "School")
+    private val optionList: List<String> = listOf("Work", "Favourite", "Home", "School")
     private var mapReady: Boolean = false
+    private val defaultLat: Double = 49.2781
+    private val defaultLang: Double = -122.9199
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-println("debug: created")
+
         binding = ActivityFavouritePoiBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.POIMap) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         prefs = this.getSharedPreferences("change this to in string.xml later", Context.MODE_PRIVATE)
         poiOptionListView = findViewById(R.id.poiListView)
@@ -50,17 +57,20 @@ println("debug: created")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-        poiMarkerOption = MarkerOptions()
         mMap.setOnMapLongClickListener(this)
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(LatLng(49.2827, 123.1207), 17f)
-        mMap.animateCamera(cameraUpdate)
         mapReady = true
-        Log.d("list click", "map is ready")
 
         initLocationManager()
 
+        // Setting up marker
+        poiMarkerOption = MarkerOptions()
+        poiMarkerOption.position(LatLng(defaultLat, defaultLang))
+        poiMarker = mMap.addMarker(poiMarkerOption)!!
+        poiMarker.remove()
+
+        dropPoiPin("Work")
+
         poiOptionListView.setOnItemClickListener { parent, view, position, id ->
-            Log.d("list click", "performing list click")
             when (position) {
                 0 -> dropPoiPin(optionList[position])
                 1 -> dropPoiPin(optionList[position])
@@ -80,8 +90,8 @@ println("debug: created")
 
 
     fun dropPoiPin(title: String){
-        val lat = prefs.getFloat(title+"_lat", 0F).toDouble()
-        val lng = prefs.getFloat(title+"_lng", 0F).toDouble()
+        val lat = prefs.getFloat(title+"_lat", defaultLat.toFloat()).toDouble()
+        val lng = prefs.getFloat(title+"_lng", defaultLang.toFloat()).toDouble()
         val poiLatLng = LatLng(lat, lng)
         poiMarkerOption.title(title).position(poiLatLng)
 
@@ -90,37 +100,44 @@ println("debug: created")
         if(poiMarker != null)
             poiMarker.remove()
         poiMarker = mMap.addMarker(poiMarkerOption)!!
-        println("debug: dropping the pin")
     }
 
     override fun onMapLongClick(latLng: LatLng) {
         showAlertDialog(latLng)
-        Log.d("long click", "performing the long click")
     }
 
     fun showAlertDialog(latLng: LatLng) {
         val alertDialog: AlertDialog? = this.let {
             val builder = AlertDialog.Builder(it)
+            var posList: Int = 0
+            val editor = prefs.edit()
 
-            builder.setSingleChoiceItems(optionList.toTypedArray(), 0) { dialog, pos ->
+            val input = EditText(it)
+            input.inputType = InputType.TYPE_CLASS_TEXT
+            input.hint = "Enter comment"
+            builder.setView(input)
+
+            builder.setSingleChoiceItems(optionList.toTypedArray(), -1) { dialog, pos ->
+                posList = pos
                 Toast.makeText(this, "Update", Toast.LENGTH_SHORT).show()
             }
                 .setPositiveButton("Ok") { dialog, pos ->
-                    prefs.edit().putFloat(optionList[pos]+"_lat", latLng.latitude.toFloat())
-                    prefs.edit().putFloat(optionList[pos]+"_lng", latLng.longitude.toFloat())
-                    prefs.edit().apply()
-                    poiListAdapter.notifyDataSetChanged()
-                    dropPoiPin(optionList[pos])
-                    Toast.makeText(this, "Updating ${optionList[pos]}", Toast.LENGTH_SHORT).show()
+                    editor.putFloat(optionList[posList]+"_lat", latLng.latitude.toFloat())
+                    editor.putFloat(optionList[posList]+"_lng", latLng.longitude.toFloat())
+
+                    var descriptionResult: String = "None"
+                    if(input.text.toString() != "")
+                        descriptionResult = input.text.toString()
+                    editor.putString(optionList[posList]+"_description", descriptionResult)
+                    editor.apply()
+
+                    dropPoiPin(optionList[posList])
+                    Toast.makeText(this, "Updating ${optionList[posList]}", Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton("Cancel"){dialog, pos ->
                     dialog.dismiss()
                 }
                 .setTitle("Save location as:")
-
-            val input = EditText(this)
-            input.setHint("Enter comment")
-            builder.setView(input)
 
             builder.create()
             builder.show()
@@ -142,9 +159,8 @@ println("debug: created")
     }
 
     override fun onLocationChanged(location: Location) {
-        // Not needed for this
+        // Not needed
     }
-
 
 }
 
@@ -169,17 +185,19 @@ class PoiListAdapter(private val context: Context, private var optionList: List<
         val textMiddle = view.findViewById<TextView>(R.id.list_adapter_middle)
         val textBottom = view.findViewById<TextView>(R.id.list_adapter_bottom)
         textTop.text = optionList[position]
-        textMiddle.text = "Description: ${prefs.getString(optionList[position]+"_description", "None")}"
+        val description = "Description: ${prefs.getString(optionList[position]+"_description", "None")}"
+        textMiddle.text = description
 
-        val lat = prefs.getFloat(optionList[position]+"_lat", 0F).toDouble()
-        val lng = prefs.getFloat(optionList[position]+"_lng", 0F).toDouble()
+        val lat = prefs.getFloat(optionList[position]+"_lat", 49.2781F).toDouble()
+        val lng = prefs.getFloat(optionList[position]+"_lng", -122.9199F).toDouble()
         val geocoder = Geocoder(context, Locale.getDefault())
         val addresses = geocoder.getFromLocation(lat, lng,1)
-        var addressResult: String = "None"
+        var addressResult: String = "Could not define"
         if(addresses.isNotEmpty())
             addressResult = addresses[0].getAddressLine(0).toString()
 
         textBottom.text = "Address: $addressResult"
+
         return view
     }
 
