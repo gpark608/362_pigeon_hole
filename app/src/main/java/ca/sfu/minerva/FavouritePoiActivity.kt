@@ -48,7 +48,7 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
             .findFragmentById(R.id.POIMap) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        prefs = this.getSharedPreferences("change this to in string.xml later", Context.MODE_PRIVATE)
+        prefs = this.getSharedPreferences(R.string.shared_preference_key.toString(), Context.MODE_PRIVATE)
         poiOptionListView = findViewById(R.id.poiListView)
         poiListAdapter = PoiListAdapter(this, optionList)
         poiOptionListView.adapter = poiListAdapter
@@ -119,7 +119,6 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
 
             builder.setSingleChoiceItems(optionList.toTypedArray(), -1) { dialog, pos ->
                 posList = pos
-                Toast.makeText(this, "Update", Toast.LENGTH_SHORT).show()
             }
                 .setPositiveButton("Ok") { dialog, pos ->
                     editor.putFloat(optionList[posList]+"_lat", latLng.latitude.toFloat())
@@ -165,7 +164,7 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
 }
 
 class PoiListAdapter(private val context: Context, private var optionList: List<String>): BaseAdapter(){
-    private var prefs: SharedPreferences = context.getSharedPreferences("change this to in string.xml later", Context.MODE_PRIVATE)
+    private var prefs: SharedPreferences = context.getSharedPreferences(R.string.shared_preference_key.toString(), Context.MODE_PRIVATE)
 
     override fun getCount(): Int {
         return optionList.size
