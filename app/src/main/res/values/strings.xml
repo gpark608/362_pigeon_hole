@@ -10,10 +10,11 @@
     <string name="label_password">Password</string>
     <string name="label_login">Login</string>
     <string name="label_register">Register</string>
-    <string name="title_activity_maps">MapsActivity</string>
-    <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_bike_map">BikeMapActivity</string>
     <string name="label_log_in_action">Log in</string>
     <string name="label_or">or</string>
     <string name="continue_as_guest">Continue as Guest</string>
+
+    <!-- Shared Preference -->
+    <string name="shared_preference_key">shared_preference_key</string>
 </resources>
