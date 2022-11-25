@@ -38,11 +38,11 @@ class TrackingService: Service(), LocationListener {
         const val DISTANCE = "DISTANCE"
         const val TOTAL_TIME = "TOTAL_TIME"
         const val ALTITUDE = "ALTITUDE"
+        const val LOCATIONS = "LOCATIONS"
     }
 
     override fun onCreate() {
         super.onCreate()
-
         locationList = ArrayList()
         startTime = System.currentTimeMillis()
 
@@ -50,21 +50,20 @@ class TrackingService: Service(), LocationListener {
         initLocationManager()
     }
 
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        return START_NOT_STICKY
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cleanupTasks()
         stopSelf()
     }
+
     private fun cleanupTasks() {
         mapDataHandler = null
         locationManager.removeUpdates(this)
         locationList.clear()
-    }
-
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        println("DEBUG: onStartCommand() called")
-        return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -78,6 +77,7 @@ class TrackingService: Service(), LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
+        println("DEBUG: Location Changed")
         // add locations
         val lat = location.latitude
         val lng = location.longitude
@@ -98,6 +98,7 @@ class TrackingService: Service(), LocationListener {
     }
 
     private fun sendMapData() {
+        println("DEBUG: Send Map Data")
         try {
             if (mapDataHandler != null) {
                 val bundle = Bundle()
@@ -105,6 +106,7 @@ class TrackingService: Service(), LocationListener {
                 bundle.putFloat(DISTANCE, distance)
                 bundle.putDouble(TOTAL_TIME, totalTime)
                 bundle.putDouble(ALTITUDE, altitude)
+                bundle.putString(LOCATIONS, Helper.latLngToString(locationList))
 
                 val mapMessage = mapDataHandler!!.obtainMessage()
                 mapMessage.data = bundle
