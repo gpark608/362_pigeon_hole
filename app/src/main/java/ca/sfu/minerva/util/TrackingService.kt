@@ -50,6 +50,18 @@ class TrackingService: Service(), LocationListener {
         initLocationManager()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        cleanupTasks()
+        stopSelf()
+    }
+    private fun cleanupTasks() {
+        mapDataHandler = null
+        locationManager.removeUpdates(this)
+        locationList.clear()
+    }
+
+
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         println("DEBUG: onStartCommand() called")
         return START_NOT_STICKY
