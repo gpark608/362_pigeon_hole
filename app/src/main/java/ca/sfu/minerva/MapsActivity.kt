@@ -112,6 +112,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
 
             mMap.animateCamera(cameraUpdate)
             bikeMarker = mMap.addMarker(bikeMarkerOptions)!!
+
             bikeMarkerPresent=true
         }else{
 

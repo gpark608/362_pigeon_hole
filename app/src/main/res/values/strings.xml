@@ -24,4 +24,9 @@
     <string name="cta2">Only takes 5 minutes!</string>
     <string name="project_529_desc">By registering your bike with Project 529, you can notify Project 529\'s online community of law enforcement agencies, universities, bike clubs, and more of your stolen bike.</string>
     <string name="label_later">I\'ll do it later</string>
+    <string name="title_home">Home</string>
+    <string name="title_map">Map</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_activity_core">CoreActivity</string>
+
 </resources>
