@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import ca.sfu.minerva.database.BikeRack
 import ca.sfu.minerva.databinding.ActivityBikeMapBinding
+import ca.sfu.minerva.util.MapViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -28,10 +29,18 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
 
 
-class BikeMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener  {
+class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener  {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityBikeMapBinding
+
+    private lateinit var mapViewModel: MapViewModel
+    private lateinit var serviceIntent: Intent
+    private var isBind = false
+
+    private lateinit var polylineOptions: PolylineOptions
+    private lateinit var polylines: java.util.ArrayList<Polyline>
+    private lateinit var latestLocation: LatLng
 
     private lateinit var locationManager: LocationManager
     private var centerMap = false
@@ -214,12 +223,12 @@ class BikeMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListene
             val criteria = Criteria()
             criteria.accuracy = Criteria.ACCURACY_FINE
             val provider : String? = locationManager.getBestProvider(criteria, true)
-            if(provider != null) {
+            if (provider != null) {
                 val location = locationManager.getLastKnownLocation(provider)
 
-                if(location != null) {
+                if (location != null) {
                     onLocationChanged(location)
-                }else {
+                } else {
 //                    locationManager.requestLocationUpdates(provider, 0, 0f, this)
                     locationManager.requestLocationUpdates(
                         provider,
