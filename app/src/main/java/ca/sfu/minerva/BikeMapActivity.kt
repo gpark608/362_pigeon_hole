@@ -2,6 +2,7 @@ package ca.sfu.minerva
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -15,9 +16,12 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.database.BikeRack
 import ca.sfu.minerva.databinding.ActivityBikeMapBinding
+import ca.sfu.minerva.util.Helper
 import ca.sfu.minerva.util.MapViewModel
+import ca.sfu.minerva.util.TrackingService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -27,9 +31,10 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
+import com.google.rpc.Help
 
 
-class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener  {
+class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback  {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityBikeMapBinding
@@ -41,6 +46,7 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener
     private lateinit var polylineOptions: PolylineOptions
     private lateinit var polylines: java.util.ArrayList<Polyline>
     private lateinit var latestLocation: LatLng
+    private var locations: ArrayList<LatLng> = ArrayList()
 
     private lateinit var locationManager: LocationManager
     private var centerMap = false
@@ -55,12 +61,19 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener
     private lateinit var polylineOptions1: PolylineOptions
     private lateinit var polylineOptions2: PolylineOptions
 
+    private var speed = 0F
+    private var distance = 0F
+    private var altitude = 0.0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityBikeMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        serviceIntent = Intent(this, TrackingService::class.java)
+        mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -72,6 +85,16 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener
             startActivity(favouritesIntent)
         }
 
+    }
+
+    // override finish to stop service and unbind
+    override fun finish() {
+        super.finish()
+        if (isBind) {
+            this.applicationContext.unbindService(mapViewModel)
+            this.applicationContext.stopService(serviceIntent)
+            isBind = false
+        }
     }
 
     /*
@@ -94,6 +117,37 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener
         addBikeRacks()
         addBikeTheft()
         addBikeRoutes()
+
+        mapViewModel.mapBundle.observe(this) { bundle ->
+            updateMap(bundle)
+        }
+    }
+
+    private fun updateMap(bundle: Bundle) {
+        speed = bundle.getFloat(TrackingService.SPEED)
+        distance = bundle.getFloat(TrackingService.DISTANCE)
+        altitude = bundle.getDouble(TrackingService.ALTITUDE)
+        locations = Helper.jsonToLatLng(bundle.getString(TrackingService.LOCATIONS)!!)
+        latestLocation = locations.last()
+
+        println("~~~~~~ MAP DATA ~~~~~~")
+        println("Speed: $speed")
+        println("Distance: $distance")
+        println("Altitude: $altitude")
+        println("Location: $latestLocation")
+
+        // continuously update the view to center the user
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latestLocation, 15f)
+        mMap.animateCamera(cameraUpdate, 400, null)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startTrackingService() {
+        println("DEBUG: tracking service started")
+        mMap.isMyLocationEnabled = true
+        this.applicationContext.startService(serviceIntent)
+        this.applicationContext.bindService(serviceIntent, mapViewModel, Context.BIND_AUTO_CREATE)
+        isBind = true
     }
 
     private fun addBikeRacks() {
@@ -202,16 +256,16 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener
     1) Center map
     2) Update location marker
      */
-    override fun onLocationChanged(location: Location) {
-        val lat = location.latitude
-        val lng = location.longitude
-        val latLng = LatLng(lat, lng)
-
-        if (!centerMap) {
-            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
-            mMap.animateCamera(cameraUpdate)
-        }
-    }
+//    override fun onLocationChanged(location: Location) {
+//        val lat = location.latitude
+//        val lng = location.longitude
+//        val latLng = LatLng(lat, lng)
+//
+//        if (!centerMap) {
+//            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
+//            mMap.animateCamera(cameraUpdate)
+//        }
+//    }
 
     /*
     Selects the best type of provider based on locationManager and attaches listener to onLocationChange function
@@ -227,44 +281,37 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener
                 val location = locationManager.getLastKnownLocation(provider)
 
                 if (location != null) {
-                    onLocationChanged(location)
+//                    onLocationChanged(location)
+                    println("placeholder")
                 } else {
 //                    locationManager.requestLocationUpdates(provider, 0, 0f, this)
-                    locationManager.requestLocationUpdates(
-                        provider,
-                        0,
-                        0f,
-                        this
-                    )
+//                    locationManager.requestLocationUpdates(
+//                        provider,
+//                        0,
+//                        0f,
+//                        this
+//                    )
+                        println("placeholder")
                 }
             }
         } catch (e: SecurityException) {
         }
     }
 
-    /*
-    Verifies that location permissions were granted then calls initLocationManager
-     */
-    fun checkPermission() {
-        if (Build.VERSION.SDK_INT < 23) return
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
-        } else {
-            initLocationManager()
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startTrackingService()
+            }
         }
     }
 
-
-    /*
-    Verifies permissions were granted and calls initLocationManager
-     */
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == 0) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                initLocationManager()
-            }
+    private fun checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
+        else {
+            startTrackingService()
         }
     }
 
@@ -273,7 +320,5 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback, LocationListener
      */
     override fun onDestroy() {
         super.onDestroy()
-        if (locationManager != null)
-            locationManager.removeUpdates(this)
     }
 }
