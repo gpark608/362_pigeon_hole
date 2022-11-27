@@ -39,7 +39,7 @@ class ProfileFragment : Fragment() {
 
         sharedPreferences = activity?.getSharedPreferences("LoginInfo", AppCompatActivity.MODE_PRIVATE)!!
         editor = sharedPreferences.edit()
-        val logOutBtn = root.findViewById<TextView>(R.id.logout)
+        val logOutBtn = root.findViewById<TextView>(R.id.text_logout)
         logOutBtn.setOnClickListener {
             editor.putString("email", "")
             editor.putString("pass", "")
