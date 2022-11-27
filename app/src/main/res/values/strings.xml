@@ -4,6 +4,9 @@
     <!-- Common -->
     <string name="title_activity_maps">MapsActivity</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="settings">Settings</string>
+    <string name="log_out">Log Out</string>
+    <string name="edit">Edit</string>
 
     <!-- Login (Main) Activity   -->
     <string name="label_email">Email</string>
@@ -28,5 +31,21 @@
     <string name="title_map">Map</string>
     <string name="title_profile">Profile</string>
     <string name="title_activity_core">CoreActivity</string>
+
+    <!-- Profile Fragment-->
+    <string-array name="user_data_titles">
+        <item>My Bike</item>
+        <item>Routes</item>
+        <item>Favourites</item>
+        <item>Statistics</item>
+    </string-array>
+    <string name="statistics">Statistics</string>
+    <string name="favourite_locations">Favourite Locations</string>
+    <string name="routes">Routes</string>
+    <string name="my_bikes">My Bikes</string>
+    <string name="current_bike_stats">Current Bike Stats</string>
+    <string name="stats">Stats</string>
+    <string name="desc_profile_picture">Profile Picture</string>
+    <string name="dummy_name">John Doe</string>
 
 </resources>
