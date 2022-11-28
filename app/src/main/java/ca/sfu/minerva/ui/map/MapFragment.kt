@@ -7,30 +7,43 @@ import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.BuildConfig
 import ca.sfu.minerva.FavouritePoiActivity
 import ca.sfu.minerva.R
 import ca.sfu.minerva.database.BikeRack
 import ca.sfu.minerva.databinding.FragmentMapBinding
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.PolyUtil
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
+import org.json.JSONObject
+import java.io.File
+import java.io.FileInputStream
+import java.util.Properties
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
+
+class MapFragment : Fragment(), OnMapReadyCallback, LocationListener,GoogleMap.OnMapLongClickListener {
 
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -49,6 +62,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private lateinit var polylineOptions2: PolylineOptions
     private lateinit var mMap: GoogleMap
 
+    private lateinit var bikeMarkerOptions: MarkerOptions
+    private lateinit var bikeMarker: Marker
+
+    private var bikeMarkerPresent = false
+    private var latLngDB: LatLng = LatLng(0.0,0.0)
+    private val mapsAPIKey = BuildConfig.MAPS_API_KEY
+
+    private var currentLatLng = LatLng(0.0, 0.0)
+    private var destLatLng = LatLng(49.256390, -122.956770)
+
+    private var transMode = arrayOf("BICYCLING", "WALKING")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -73,6 +97,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         return root
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -81,7 +106,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        mMap.setOnMapLongClickListener(this)
+
         markerOptions = MarkerOptions()
+        bikeMarkerOptions = MarkerOptions()
+        bikeMarkerOptions.title("bikeLocation")
 
         mClusterManager = ClusterManager(activity, mMap)
         mMap.setOnCameraIdleListener(mClusterManager);
@@ -207,11 +236,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         val lat = location.latitude
         val lng = location.longitude
         val latLng = LatLng(lat, lng)
+        currentLatLng = LatLng(lat, lng)
 
-        if (!centerMap) {
-            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
+        val cameraUpdate: CameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
+
+        latLngDB = latLng
+        bikeMarkerOptions.position(latLng)
+
+        if(!bikeMarkerPresent){
+
             mMap.animateCamera(cameraUpdate)
+            bikeMarker = mMap.addMarker(bikeMarkerOptions)!!
+
+            bikeMarkerPresent=true
+        }else{
+
+            bikeMarker.remove()
+            bikeMarker = mMap.addMarker(bikeMarkerOptions)!!
+
         }
+
+        bikeMarker.showInfoWindow()
     }
 
     /*
@@ -241,5 +286,48 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
             }
         } catch (e: SecurityException) {
         }
+    }
+
+    override fun onMapLongClick(latLng: LatLng) {
+        latLngDB = latLng
+        locationManager.removeUpdates(this)
+//        bikeMarker.remove()
+        bikeMarkerOptions.position(latLng)
+
+        bikeMarker = mMap.addMarker(bikeMarkerOptions)!!
+        bikeMarker.showInfoWindow()
+        destLatLng = LatLng(latLng.latitude, latLng.longitude)
+        test()
+    }
+
+    fun test(){
+//        https://lwgmnz.me/2018/09/20/google-maps-and-directions-api-using-kotlin/
+        val path: MutableList<List<LatLng>> = ArrayList()
+        val urlDirections = "https://maps.googleapis.com/maps/api/directions/json?origin=${currentLatLng.latitude},${currentLatLng.longitude}&destination=${destLatLng.latitude},${destLatLng.longitude}&mode=BICYCLING&key=${mapsAPIKey}"
+
+
+        val directionsRequest = object : StringRequest(Request.Method.GET, urlDirections, Response.Listener<String> {
+           response ->
+            val jsonResponse = JSONObject(response)
+            val statusCode = jsonResponse.getString("status")
+            if(statusCode == "OK"){
+                val routes = jsonResponse.getJSONArray("routes")
+                val legs = routes.getJSONObject(0).getJSONArray("legs")
+                val steps = legs.getJSONObject(0).getJSONArray("steps")
+                for (i in 0 until steps.length()) {
+                    val points = steps.getJSONObject(i).getJSONObject("polyline").getString("points")
+                    path.add(PolyUtil.decode(points))
+                }
+                for (i in 0 until path.size) {
+                    mMap.addPolyline(PolylineOptions().addAll(path[i]).color(Color.RED))
+                }
+//                println("debug: jsonResponse ${jsonResponse}")
+            }else{}
+
+           }, Response.ErrorListener {
+           _ ->
+           }){}
+       val requestQueue = Volley.newRequestQueue(context)
+       requestQueue.add(directionsRequest)
     }
 }
