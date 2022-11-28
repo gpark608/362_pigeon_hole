@@ -28,18 +28,18 @@
                 android:padding="20dp"
                 >
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/ivProfilePicture"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_marginBottom="20dp"
-                    android:layout_gravity="center"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerInside"
-                    app:shapeAppearanceOverlay="@style/circleImageView"
-                    tools:srcCompat="@drawable/default_profile_picture"
-                    app:srcCompat="@drawable/default_profile_picture"
-                    android:contentDescription="@string/desc_profile_picture" />
+<!--                <com.google.android.material.imageview.ShapeableImageView-->
+<!--                    android:id="@+id/ivProfilePicture"-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="100dp"-->
+<!--                    android:layout_marginBottom="20dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:adjustViewBounds="true"-->
+<!--                    android:scaleType="centerInside"-->
+<!--                    app:shapeAppearanceOverlay="@style/circleImageView"-->
+<!--                    tools:srcCompat="@drawable/default_profile_picture"-->
+<!--                    app:srcCompat="@drawable/default_profile_picture"-->
+<!--                    android:contentDescription="@string/desc_profile_picture" />-->
 
                 <TextView
                     android:layout_width="wrap_content"
