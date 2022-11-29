@@ -1,13 +1,25 @@
 package ca.sfu.minerva.ui.home
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Criteria
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.BuildConfig
 import ca.sfu.minerva.R
 import ca.sfu.minerva.databinding.FragmentHomeBinding
 import com.google.android.gms.maps.model.LatLng
@@ -29,7 +41,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), LocationListener {
 
     private var _binding: FragmentHomeBinding? = null
     private lateinit var tvTemperature: TextView
@@ -39,12 +51,14 @@ class HomeFragment : Fragment() {
     private lateinit var ivWeatherIcon: ImageView
     private lateinit var container: LinearLayout
     private lateinit var btnChangeBackground: Button
-    private lateinit var btnAddToCalendar: Button
     private lateinit var listview: ListView
     private lateinit var firestore: FirebaseFirestore
     private lateinit var eventList: ArrayList<Event>
     private lateinit var adapter: EventAdapter
     private var background = 0
+    private lateinit var locationManager: LocationManager
+    private val apiKey: String = BuildConfig.W_API_KEY
+
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -66,9 +80,9 @@ class HomeFragment : Fragment() {
 
 
         initializeTextViews()
+        checkPermission()
 
         CoroutineScope(Dispatchers.IO).launch{
-            getWeatherAPICall()
             if (container != null) {
                 getEventsAPICall(container.context)
             }
@@ -91,7 +105,7 @@ class HomeFragment : Fragment() {
         container.setBackgroundResource(R.drawable.bg_one)
     }
 
-    private suspend fun getWeatherAPICall(){
+    private suspend fun getWeatherAPICall(latLng: LatLng){
         withContext(Dispatchers.IO){
             val client = HttpClient {
                 install(JsonFeature) {
@@ -99,10 +113,12 @@ class HomeFragment : Fragment() {
                 }
             }
             val WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?" +
-                    "lat=49.267425" +
-                    "&lon=-123.012139&units=metric" +
-                    "&APPID=3648692e8f0b310f8133e0fecabefa7d"
+                    "lat=" + latLng.latitude +
+                    "&lon=" + latLng.longitude +
+                    "&units=metric" +
+                    "&APPID=" + apiKey
             val response: String = client.get(WEATHER_URL)
+            println("WHY $latLng")
 
             //GET WEATHER DESCRIPTION
             val jsonObj = JSONObject(response)
@@ -201,6 +217,68 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onLocationChanged(location: Location) {
+        val lat = location.latitude
+        val lng = location.longitude
+        val latLng = LatLng(lat, lng)
+        CoroutineScope(Dispatchers.IO).launch{
+            getWeatherAPICall(latLng)
+        }
+    }
+
+    /*
+    Verifies that location permissions were granted then calls initLocationManager
+     */
+    private fun checkPermission() {
+        if (Build.VERSION.SDK_INT < 23) return
+        if (activity?.let { ContextCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) } != PackageManager.PERMISSION_GRANTED){
+            activity?.let { ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0) }
+        } else {
+            initLocationManager()
+        }
+    }
+
+    /*
+    Verifies permissions were granted and calls initLocationManager
+     */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+            if (requestCode == 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    initLocationManager()
+                }
+            }
+        }
+
+    /*
+    Selects the best type of provider based on locationManager and attaches listener to onLocationChange function
+     */
+    @SuppressLint("MissingPermission")
+    fun initLocationManager() {
+        try {
+            locationManager = activity?.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+            val criteria = Criteria()
+            criteria.accuracy = Criteria.ACCURACY_FINE
+            val provider : String? = locationManager.getBestProvider(criteria, true)
+            if(provider != null) {
+                val location = locationManager.getLastKnownLocation(provider)
+
+                if(location != null) {
+                    onLocationChanged(location)
+                }else {
+                    locationManager.requestLocationUpdates(
+                        provider,
+                        10*1000*60,
+                        0f,
+                        this
+                    )
+                }
+            }
+        } catch (e: SecurityException) {
+        }
     }
 
 }
