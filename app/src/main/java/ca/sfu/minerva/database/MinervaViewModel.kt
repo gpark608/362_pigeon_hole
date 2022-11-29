@@ -44,7 +44,6 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
         repository.insertFavouriteLocation(data)
     }
 
-
 }
 
 class MinervaViewModelFactory (private val repository: MinervaRepository) : ViewModelProvider.Factory {

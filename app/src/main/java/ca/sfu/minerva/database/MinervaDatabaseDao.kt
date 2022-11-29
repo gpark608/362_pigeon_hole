@@ -1,6 +1,7 @@
 package ca.sfu.minerva.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +49,7 @@ interface MinervaDatabaseDao {
     @Query("SELECT * FROM bike_location_table")
     fun getAllBikeLocation(): Flow<List<BikeLocation>>
 
-    @Query("SELECT * FROM favourite_locations_table")
+    @Query("SELECT * FROM favourite_table")
     fun getAllFavouriteLocation(): Flow<List<FavouriteLocation>>
 
 //    -----
@@ -69,4 +70,10 @@ interface MinervaDatabaseDao {
 
     @Query("SELECT * FROM bike_location_table WHERE id = :key")
     suspend fun getBikeLocationFromKey(key: Long) : BikeLocation
+
+//  -----
+    @Query("DELETE FROM favourite_table WHERE name = :key")
+    suspend fun deleteFavouriteLocationFromName(key: String): Void
+
+
 }

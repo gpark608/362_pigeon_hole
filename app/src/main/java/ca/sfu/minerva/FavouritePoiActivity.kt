@@ -14,7 +14,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.ActivityFavouritePoiBinding
+import ca.sfu.minerva.ui.map.MapViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.*
+import kotlin.collections.ArrayList
 
 class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, LocationListener {
     private lateinit var binding: ActivityFavouritePoiBinding
@@ -33,7 +37,13 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
     private lateinit var poiListAdapter: PoiListAdapter
     private lateinit var poiMarker: Marker
     private lateinit var locationManager:  LocationManager
-    private val optionList: List<String> = listOf("Work", "Favourite", "Home", "School")
+
+    private lateinit var database: MinervaDatabase
+    private lateinit var databaseDao: MinervaDatabaseDao
+    private lateinit var repository: MinervaRepository
+    private lateinit var viewModelFactory: MinervaViewModelFactory
+    private lateinit var viewModel: MinervaViewModel
+    private lateinit var optionList: ArrayList<FavouriteLocation>
     private var mapReady: Boolean = false
     private val defaultLat: Double = 49.2781
     private val defaultLang: Double = -122.9199
@@ -49,9 +59,21 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         mapFragment.getMapAsync(this)
 
         prefs = this.getSharedPreferences(R.string.shared_preference_key.toString(), Context.MODE_PRIVATE)
+        optionList = ArrayList()
         poiOptionListView = findViewById(R.id.poiListView)
         poiListAdapter = PoiListAdapter(this, optionList)
         poiOptionListView.adapter = poiListAdapter
+
+        database = MinervaDatabase.getInstance(this)
+        databaseDao = database.MinervaDatabaseDao
+        repository = MinervaRepository(databaseDao)
+        viewModelFactory = MinervaViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MinervaViewModel::class.java)
+
+        viewModel.FavouriteLocationDataLive.observe(this){
+            poiListAdapter.replaceList(it)
+            poiListAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -68,32 +90,31 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         poiMarker = mMap.addMarker(poiMarkerOption)!!
         poiMarker.remove()
 
-        dropPoiPin("Work")
-
         poiOptionListView.setOnItemClickListener { parent, view, position, id ->
-            when (position) {
-                0 -> dropPoiPin(optionList[position])
-                1 -> dropPoiPin(optionList[position])
-                2 -> dropPoiPin(optionList[position])
-                3 -> dropPoiPin(optionList[position])
-                4 -> dropPoiPin(optionList[position])
-            }
+            val fav = poiListAdapter.getItem(position)
+            dropPoiPin(fav)
 
             Toast.makeText(
                 this,
-                "Viewing location of ${optionList[position]}",
+                "Viewing location of ${fav.name}",
                 Toast.LENGTH_SHORT
             ).show()
+        }
+
+        if(poiListAdapter.count > 0){
+            dropPoiPin(poiListAdapter.getItem(0))
+        }
+        else{
+            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(LatLng(defaultLat, defaultLang), 25f)
+            mMap.animateCamera(cameraUpdate)
         }
 
     }
 
 
-    fun dropPoiPin(title: String){
-        val lat = prefs.getFloat(title+"_lat", defaultLat.toFloat()).toDouble()
-        val lng = prefs.getFloat(title+"_lng", defaultLang.toFloat()).toDouble()
-        val poiLatLng = LatLng(lat, lng)
-        poiMarkerOption.title(title).position(poiLatLng)
+    fun dropPoiPin(fav: FavouriteLocation){
+        val poiLatLng = getLatLang(fav)
+        poiMarkerOption.title(fav.name).position(poiLatLng)
 
         val cameraUpdate = CameraUpdateFactory.newLatLngZoom(poiLatLng, 17f)
         mMap.animateCamera(cameraUpdate)
@@ -108,35 +129,44 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
 
     fun showAlertDialog(latLng: LatLng) {
         val alertDialog: AlertDialog? = this.let {
+            var customLayout: LinearLayout = LinearLayout(this)
+            customLayout.orientation = LinearLayout.VERTICAL
+
             val builder = AlertDialog.Builder(it)
             var posList: Int = 0
-            val editor = prefs.edit()
+            var fav: FavouriteLocation = FavouriteLocation()
 
-            val input = EditText(it)
-            input.inputType = InputType.TYPE_CLASS_TEXT
-            input.hint = "Enter comment"
-            builder.setView(input)
+            val titleInput = EditText(it)
+            titleInput.inputType = InputType.TYPE_CLASS_TEXT
+            titleInput.hint = "Enter name of poi"
+            customLayout.addView(titleInput)
 
-            builder.setSingleChoiceItems(optionList.toTypedArray(), -1) { dialog, pos ->
-                posList = pos
+
+            val commentInput = EditText(it)
+            commentInput.inputType = InputType.TYPE_CLASS_TEXT
+            commentInput.hint = "Enter comment"
+            customLayout.addView(commentInput)
+
+            builder.setView(customLayout)
+
+            builder.setPositiveButton("Ok") { dialog, pos ->
+                fav.name = titleInput.text.toString()
+
+                fav.favLatLng = "${latLng.latitude.toFloat()},${latLng.longitude.toFloat()}"
+
+                var descriptionResult: String = "None"
+                if(commentInput.text.toString() != "")
+                    descriptionResult = commentInput.text.toString()
+                fav.description = descriptionResult
+
+                viewModel.insertFavouriteLocation(fav)
+                dropPoiPin(fav)
+                Toast.makeText(this, "Saved ${fav.name}", Toast.LENGTH_SHORT).show()
             }
-                .setPositiveButton("Ok") { dialog, pos ->
-                    editor.putFloat(optionList[posList]+"_lat", latLng.latitude.toFloat())
-                    editor.putFloat(optionList[posList]+"_lng", latLng.longitude.toFloat())
-
-                    var descriptionResult: String = "None"
-                    if(input.text.toString() != "")
-                        descriptionResult = input.text.toString()
-                    editor.putString(optionList[posList]+"_description", descriptionResult)
-                    editor.apply()
-
-                    dropPoiPin(optionList[posList])
-                    Toast.makeText(this, "Updating ${optionList[posList]}", Toast.LENGTH_SHORT).show()
-                }
-                .setNegativeButton("Cancel"){dialog, pos ->
-                    dialog.dismiss()
-                }
-                .setTitle("Save location as:")
+            .setNegativeButton("Cancel"){dialog, _ ->
+                dialog.dismiss()
+            }
+            .setTitle("Save location as:")
 
             builder.create()
             builder.show()
@@ -161,16 +191,23 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         // Not needed
     }
 
+    fun getLatLang(fav: FavouriteLocation): LatLng{
+        var favLatLng = LatLng(
+            fav.favLatLng.substringBefore(',').toDouble(),
+            fav.favLatLng.substringAfter(',').toDouble()
+        )
+
+        return favLatLng
+    }
+
 }
 
-class PoiListAdapter(private val context: Context, private var optionList: List<String>): BaseAdapter(){
-    private var prefs: SharedPreferences = context.getSharedPreferences(R.string.shared_preference_key.toString(), Context.MODE_PRIVATE)
-
+class PoiListAdapter(private val context: Context, private var optionList: List<FavouriteLocation>): BaseAdapter(){
     override fun getCount(): Int {
         return optionList.size
     }
 
-    override fun getItem(position: Int): Any {
+    override fun getItem(position: Int): FavouriteLocation {
         return optionList[position]
     }
 
@@ -183,14 +220,20 @@ class PoiListAdapter(private val context: Context, private var optionList: List<
         val textTop = view.findViewById<TextView>(R.id.list_adapter_top)
         val textMiddle = view.findViewById<TextView>(R.id.list_adapter_middle)
         val textBottom = view.findViewById<TextView>(R.id.list_adapter_bottom)
-        textTop.text = optionList[position]
-        val description = "Description: ${prefs.getString(optionList[position]+"_description", "None")}"
-        textMiddle.text = description
+        textTop.text = optionList[position].name
+        val description = optionList[position].description
+        if(description != "")
+            textMiddle.text = "Description: " + description
+        else
+            textMiddle.text = "Description: None"
 
-        val lat = prefs.getFloat(optionList[position]+"_lat", 49.2781F).toDouble()
-        val lng = prefs.getFloat(optionList[position]+"_lng", -122.9199F).toDouble()
+        var favLatLng = LatLng(
+            optionList[position].favLatLng.substringBefore(',').toDouble(),
+            optionList[position].favLatLng.substringAfter(',').toDouble()
+        )
+
         val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses = geocoder.getFromLocation(lat, lng,1)
+        val addresses = geocoder.getFromLocation(favLatLng.latitude, favLatLng.longitude,1)
         var addressResult: String = "Could not define"
         if(addresses.isNotEmpty())
             addressResult = addresses[0].getAddressLine(0).toString()
@@ -198,6 +241,10 @@ class PoiListAdapter(private val context: Context, private var optionList: List<
         textBottom.text = "Address: $addressResult"
 
         return view
+    }
+
+    fun replaceList(newList: List<FavouriteLocation>){
+        optionList = newList
     }
 
 }
