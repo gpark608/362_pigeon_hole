@@ -12,6 +12,7 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
     val EcoStoreData: Flow<List<EcoStore>> = databaseDao.getAllEcoStores()
     val RecyclingCenterData: Flow<List<RecyclingCenter>> = databaseDao.getAllRecyclingCenters()
     val BikeLocationData: Flow<List<BikeLocation>> = databaseDao.getAllBikeLocation()
+    val FavouriteLocationData: Flow<List<FavouriteLocation>> = databaseDao.getAllFavouriteLocation()
 
     fun insertBikeRentalPlace(data: BikeRentalPlace){
         CoroutineScope(IO).launch {
@@ -46,6 +47,12 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
     fun insertBikeLocation(data: BikeLocation){
         CoroutineScope(IO).launch {
             databaseDao.insertBikeLocation(data)
+        }
+    }
+
+    fun insertFavouriteLocation(data: FavouriteLocation){
+        CoroutineScope(IO).launch {
+            databaseDao.insertFavouriteLocation(data)
         }
     }
 
