@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 
-@Entity(tableName = "favourite_locations_table")
+@Entity(tableName = "favourite_table")
 data class FavouriteLocation (
     @PrimaryKey(autoGenerate = false)
     var name: String = "",
@@ -14,5 +14,5 @@ data class FavouriteLocation (
     var description:String = "",
 
     @ColumnInfo(name = "favouriteLatLng_column")
-    var bikeLocation: LatLng = LatLng(0.0,0.0)
+    var favLatLng: String = "0.0,0.0"
 )

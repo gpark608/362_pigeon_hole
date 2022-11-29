@@ -52,6 +52,7 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
 
     fun insertFavouriteLocation(data: FavouriteLocation){
         CoroutineScope(IO).launch {
+            databaseDao.deleteFavouriteLocationFromName(data.name)
             databaseDao.insertFavouriteLocation(data)
         }
     }
