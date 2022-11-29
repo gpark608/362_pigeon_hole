@@ -1,19 +1,17 @@
 package ca.sfu.minerva.ui.home
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
-import android.provider.CalendarContract
-import android.provider.CalendarContract.Events
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.AdapterView.OnItemClickListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.R
 import ca.sfu.minerva.databinding.FragmentHomeBinding
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
@@ -64,11 +62,16 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
 
         firestore = Firebase.firestore
+        eventList = ArrayList()
+
+
         initializeTextViews()
 
         CoroutineScope(Dispatchers.IO).launch{
             getWeatherAPICall()
-            getEventsAPICall()
+            if (container != null) {
+                getEventsAPICall(container.context)
+            }
         }
 
         return root
@@ -86,18 +89,6 @@ class HomeFragment : Fragment() {
         btnChangeBackground = binding.btnChangeBackground
         btnChangeBackground.setOnClickListener {changeBackground()}
         container.setBackgroundResource(R.drawable.bg_one)
-
-        btnAddToCalendar = binding.btnAddToCalendar
-        btnAddToCalendar.setOnClickListener {insertEventIntent(Event("???"))}
-
-        listview = binding.listview
-        eventList = ArrayList()
-        eventList.add(Event("T"))
-        adapter = activity?.let { EventAdapter(it, eventList) }!!
-        listview.adapter = adapter
-        listview.onItemClickListener = OnItemClickListener { parent, view, position, id ->
-            insertEventIntent(Event("???"))
-        }
     }
 
     private suspend fun getWeatherAPICall(){
@@ -132,18 +123,18 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private suspend fun getEventsAPICall() {
-        eventList = ArrayList()
+    private suspend fun getEventsAPICall(context: Context) {
         withContext(Dispatchers.IO){
-            firestore.collection("events").get().addOnSuccessListener { events ->
+            firestore.collection("events")
+                .orderBy("startTime")
+                .limit(10)
+                .get().addOnSuccessListener { events ->
                 for (event in events) {
                     val id = event["id"].toString()
                     val title = event["title"].toString()
                     val description = event["description"].toString()
-                    val startTime = Calendar.getInstance()
-                    val endTime = Calendar.getInstance()
-                    startTime.set(2012, 9, 14, 13, 30);
-                    endTime.set(2012, 9, 14, 20, 30);
+                    val startTime = (event["startTime"] as Timestamp).toDate()
+                    val endTime = (event["endTime"] as Timestamp).toDate()
                     val g = event["geopoint"] as GeoPoint
                     val geopoint = LatLng(g.latitude, g.longitude);
                     val location = event["location"].toString()
@@ -151,17 +142,12 @@ class HomeFragment : Fragment() {
                     if(event["allDay"] == 1){
                         allDay = true
                     }
-                        eventList.add(Event(title))
-//                    eventList.add(Event(id, title, description, startTime, endTime, geopoint, location, allDay))
+                    eventList.add(Event(id, title, description, startTime, endTime, geopoint, location, allDay))
                 }
-
-                adapter.notifyDataSetChanged();
-                listview.invalidateViews()
-                println("WTF: ${adapter.getItem(0)}")
+                    adapter = EventAdapter(context, eventList)
+                    listview = binding.listview
+                    listview.adapter = adapter
             }
-        }
-        withContext(Dispatchers.Main){
-
         }
     }
 
@@ -211,33 +197,6 @@ class HomeFragment : Fragment() {
 
         }
     }
-
-    private fun insertEventIntent(event: Event){
-        val startTime = Calendar.getInstance()
-        val endTime = Calendar.getInstance()
-        startTime.set(2012, 9, 14, 13, 30);
-        endTime.set(2012, 9, 14, 20, 30);
-
-        val intent = Intent(Intent.ACTION_INSERT)
-            .putExtra(Events.TITLE, "HELLO")
-            .setData(Events.CONTENT_URI)
-            .putExtra(
-                CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-                startTime.timeInMillis
-            )
-            .putExtra(
-                CalendarContract.EXTRA_EVENT_END_TIME,
-                endTime.timeInMillis
-            )
-            .putExtra(Events.DESCRIPTION, "FUN TIMES")
-            .putExtra(Events.EVENT_LOCATION, "LOCATION LOCATION")
-            .putExtra(Events.AVAILABILITY, Events.AVAILABILITY_BUSY)
-            .putExtra(Events.ALL_DAY, 0)
-
-        activity?.startActivity(intent)
-    }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
