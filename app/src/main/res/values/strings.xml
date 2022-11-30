@@ -47,5 +47,8 @@
     <string name="stats">Stats</string>
     <string name="desc_profile_picture">Profile Picture</string>
     <string name="dummy_name">John Doe</string>
+    <string name="unknown">N/A</string>
+    <string name="add_to_calendar">Add To Calendar</string>
+    <string name="upcoming_events">Upcoming Events:</string>
 
 </resources>
