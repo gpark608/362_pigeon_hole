@@ -63,13 +63,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-
-        root.findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {
-            val favouritesIntent = Intent(activity, FavouritePoiActivity::class.java)
-            startActivity(favouritesIntent)
-        }
-
-
         return root
     }
 
@@ -95,6 +88,36 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         addBikeRoutes()
 
         initLocationManager()
+
+        requireActivity().findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {
+            val favouritesIntent = Intent(activity, FavouritePoiActivity::class.java)
+            startActivity(favouritesIntent)
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
+            addBikeRacks()
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
+            //TODO: add action here
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRepair)?.setOnClickListener {
+            //TODO: add action here
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonRecyclingCenter)?.setOnClickListener {
+            //TODO: add action here
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
+            addBikeRoutes()
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
+            addBikeTheft()
+        }
+
     }
 
     private fun addBikeRacks() {
