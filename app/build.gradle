@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 android {
@@ -16,6 +17,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "W_API_KEY", WEATHER_API_KEY)
     }
 
     buildTypes {
@@ -39,8 +41,11 @@ android {
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlinx-serialization'
 
 dependencies {
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.2'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.2'
     def room_version = "2.4.3"
     def lifecycle_version = "2.5.1"
 
@@ -70,4 +75,11 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.preference:preference-ktx:1.2.0"
     implementation 'com.google.code.gson:gson:2.9.0'
+    
+    implementation 'io.ktor:ktor-client-core:1.5.2'
+    implementation 'io.ktor:ktor-client-android:1.5.2'
+    implementation 'io.ktor:ktor-client-serialization:1.5.2'
+    implementation 'io.ktor:ktor-client-serialization-jvm:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0'
+    implementation 'io.ktor:ktor-client-logging-jvm:1.5.0'
 }

@@ -3,17 +3,20 @@ package ca.sfu.minerva
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -23,9 +26,30 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnRegister: Button
     private lateinit var btnContinue: TextView
 
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var editor:SharedPreferences.Editor
+
     private val requestCode = 200
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+        sharedPreferences = this.getSharedPreferences("LoginInfo", MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+        val email = sharedPreferences.getString("email", "")!!
+        val pass = sharedPreferences.getString("pass", "")!!
+        login(email, pass)
+
+    }
+    private fun login(email: String, pass: String) {
+        if (email.isNotEmpty() && pass.isNotEmpty()) {
+            auth(email, pass)
+        }else{
+            loginRequired()
+
+        }
+    }
+
+    private fun loginRequired(){
         setContentView(R.layout.activity_main)
         checkPermission(this)
         emailET = findViewById(R.id.editTextEmail)
@@ -34,12 +58,11 @@ class MainActivity : AppCompatActivity() {
         btnRegister = findViewById(R.id.buttonRegister)
         btnContinue = findViewById(R.id.textViewGuest)
 
-        auth = Firebase.auth
 
         btnLogin.setOnClickListener {
-//            login()
-            val intent = Intent(this, BikeMapActivity::class.java)
-            startActivity(intent)
+            val email = emailET.text.toString().trim()
+            val pass = passwordET.text.toString().trim()
+            auth(email, pass)
         }
 
         btnRegister.setOnClickListener {
@@ -47,22 +70,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnContinue.setOnClickListener {
-            startMapsActivity()
+            startCoreActivity()
         }
+    }
+    private fun auth(email: String, pass: String){
+        if(email.isNotEmpty() && pass.isNotEmpty()){
+            auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
+                if (it.isSuccessful) {
+                    editor.putString("email", email)
+                    editor.putString("pass", pass)
+                    editor.apply()
+                    startCoreActivity()
+                }else{
+                    Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show()
+        }
+
+
     }
 
-    private fun login() {
-//        val email = emailET.text.toString().trim()
-//        val pass = passwordET.text.toString().trim()
-        val email = "admin@gmail.com"
-        val pass = "qwerty123"
-        auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
-            if (it.isSuccessful) {
-                startMapsActivity()
-            } else
-                Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun register() {
         val email = emailET.text.toString().trim()
@@ -76,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
             if (it.isSuccessful) {
                 Toast.makeText(this, "Account Created", Toast.LENGTH_SHORT).show()
-                startMapsActivity()
+                startCoreActivity()
             } else {
                 Toast.makeText(this, "Registration Failed. Please try again later.", Toast.LENGTH_SHORT).show()
             }
@@ -116,8 +145,11 @@ class MainActivity : AppCompatActivity() {
             checkPermission(this)
         }
     }
-    private fun startMapsActivity () {
-        val intent = Intent(this, MapsActivity::class.java)
+    private fun startCoreActivity () {
+
+        val intent = Intent(this, CoreActivity::class.java)
         startActivity(intent)
+
+        finish()
     }
 }

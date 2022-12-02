@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [RecyclingCenter::class, EcoStore::class, BikeRentalPlace::class, BikeTrail::class, BikeRepairShop::class, BikeLocation::class], version = 1)
+@Database(entities = [RecyclingCenter::class, EcoStore::class, BikeRentalPlace::class, BikeTrail::class, BikeRepairShop::class, BikeLocation::class, FavouriteLocation::class], version = 2)
 @TypeConverters(MinervaDataConverter::class)
 abstract class MinervaDatabase : RoomDatabase() {
     abstract val MinervaDatabaseDao : MinervaDatabaseDao
@@ -23,7 +23,7 @@ abstract class MinervaDatabase : RoomDatabase() {
                         context.applicationContext,
                         MinervaDatabase::class.java,
                         "minerva_DB"
-                    ).build()
+                    ).fallbackToDestructiveMigration().build()
                     INSTANCE = instance
                 }
                 return instance
