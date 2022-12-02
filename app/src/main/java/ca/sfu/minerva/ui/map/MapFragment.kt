@@ -71,10 +71,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         _binding = null
         locationManager.removeUpdates(this)
     }
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         markerOptions = MarkerOptions()
+        mMap.isMyLocationEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
+        mMap.setPadding(0,700,0,0)
+
 
         mClusterManager = ClusterManager(activity, mMap)
         mMap.setOnCameraIdleListener(mClusterManager);
