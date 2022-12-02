@@ -83,10 +83,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         fakeBikeTheftList()
         fakeBikeRouteList()
 
-        addBikeRacks()
-        addBikeTheft()
-        addBikeRoutes()
-
         initLocationManager()
 
         requireActivity().findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {

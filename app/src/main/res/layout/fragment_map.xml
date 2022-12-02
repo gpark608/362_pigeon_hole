@@ -106,17 +106,4 @@ android:orientation="vertical">
 
     </HorizontalScrollView>
 
-<!--    <Button-->
-<!--        android:id="@+id/buttonFavourites"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="bottom"-->
-<!--        android:layout_margin="5dp"-->
-<!--        android:text="View Favourites"-->
-<!--        map:layout_constraintBottom_toBottomOf="parent"-->
-<!--        map:layout_constraintEnd_toEndOf="parent"-->
-<!--        map:layout_constraintHorizontal_bias="0.0"-->
-<!--        map:layout_constraintStart_toStartOf="parent"-->
-<!--        map:layout_constraintTop_toTopOf="parent"-->
-<!--        map:layout_constraintVertical_bias="0.865" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>
