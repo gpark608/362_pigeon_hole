@@ -31,7 +31,8 @@ android:orientation="vertical">
         map:layout_constraintHorizontal_bias="0.0"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toTopOf="parent"
-        map:layout_constraintVertical_bias="0.865">
+        map:layout_constraintVertical_bias="0.865"
+        android:paddingTop="70dp">
 
         <LinearLayout
             android:layout_width="match_parent"
