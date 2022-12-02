@@ -63,13 +63,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-
-        root.findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {
-            val favouritesIntent = Intent(activity, FavouritePoiActivity::class.java)
-            startActivity(favouritesIntent)
-        }
-
-
         return root
     }
 
@@ -78,10 +71,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         _binding = null
         locationManager.removeUpdates(this)
     }
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         markerOptions = MarkerOptions()
+        mMap.isMyLocationEnabled = true
+        mMap.uiSettings.isMyLocationButtonEnabled = true
+        mMap.setPadding(0,700,0,0)
+
 
         mClusterManager = ClusterManager(activity, mMap)
         mMap.setOnCameraIdleListener(mClusterManager);
@@ -90,11 +88,37 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         fakeBikeTheftList()
         fakeBikeRouteList()
 
-        addBikeRacks()
-        addBikeTheft()
-        addBikeRoutes()
-
         initLocationManager()
+
+        requireActivity().findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {
+            val favouritesIntent = Intent(activity, FavouritePoiActivity::class.java)
+            startActivity(favouritesIntent)
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
+            addBikeRacks()
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
+            //TODO: add action here
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRepair)?.setOnClickListener {
+            //TODO: add action here
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonRecyclingCenter)?.setOnClickListener {
+            //TODO: add action here
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
+            addBikeRoutes()
+        }
+
+        requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
+            addBikeTheft()
+        }
+
     }
 
     private fun addBikeRacks() {
