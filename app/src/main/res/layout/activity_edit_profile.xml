@@ -25,11 +25,12 @@
             tools:ignore="TextContrastCheck" />
 
         <TextView
-            style="@style/Widget.MaterialComponents.Button"
+            android:id="@+id/button_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:text="@string/save"
+            style="@style/Widget.MaterialComponents.Button"
             tools:ignore="TextContrastCheck" />
 
     </com.google.android.material.appbar.MaterialToolbar>
@@ -71,7 +72,7 @@
                 android:hint="@string/first_name">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/text_edit_first_name"
+                    android:id="@+id/edit_text_first_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
@@ -88,7 +89,7 @@
                 android:hint="@string/last_name">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/text_edit_last_name"
+                    android:id="@+id/edit_text_last_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
@@ -113,7 +114,7 @@
                     android:hint="@string/city">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/text_edit_city"
+                        android:id="@+id/edit_text_city"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textCapWords"
@@ -131,7 +132,7 @@
                     android:hint="@string/province">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/text_edit_province"
+                        android:id="@+id/edit_text_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         />
@@ -172,7 +173,7 @@
                 android:hint="@string/birthday">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/text_edit_birthday"
+                    android:id="@+id/edit_text_birthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="date"
@@ -197,7 +198,7 @@
                     android:hint="@string/gender">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/text_edit_gender"
+                        android:id="@+id/edit_text_gender"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textCapWords"
@@ -215,7 +216,7 @@
                     android:hint="@string/weight">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/text_edit_weight"
+                        android:id="@+id/edit_text_weight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textEmailAddress"
@@ -245,7 +246,7 @@
                 android:hint="@string/label_email">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/text_edit_email"
+                    android:id="@+id/edit_text_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
@@ -262,7 +263,7 @@
                 android:hint="@string/label_password">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/text_edit_password"
+                    android:id="@+id/edit_text_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
