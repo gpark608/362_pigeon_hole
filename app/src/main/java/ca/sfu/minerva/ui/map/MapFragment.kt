@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.CoreActivity
 import ca.sfu.minerva.FavouritePoiActivity
 import ca.sfu.minerva.R
 import ca.sfu.minerva.database.BikeRack
@@ -62,6 +63,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val bikeLane = (activity as CoreActivity).bikeLane
+
+
+
 
         return root
     }
