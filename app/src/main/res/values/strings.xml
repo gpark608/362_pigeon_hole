@@ -60,11 +60,13 @@
     <string name="city">City</string>
     <string name="birthday">Birthday</string>
     <string name="gender">Gender</string>
-    <string name="weight">Weight</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="weight_lb">Weight (lb)</string>
     <string name="province">Province</string>
     <string name="athlete_information">Athlete Information</string>
     <string name="account_details">Account Details</string>
     <string name="athlete_information_help">Used to calculate calories</string>
     <string name="none_selected">None Selected</string>
+    <string name="prefer_not_to_say">Prefer Not To Say</string>
 
 </resources>
