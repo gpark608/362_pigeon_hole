@@ -45,10 +45,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
     private lateinit var mProvider: HeatmapTileProvider
     private lateinit var mOverlay: TileOverlay
-    private lateinit var polylineOptions1: PolylineOptions
+    private lateinit var polylineOptions: PolylineOptions
 
     private lateinit var mMap: GoogleMap
 
+    private var bikeRacksToggle: Boolean = false
+    private var bikeTheftsToggle: Boolean = false
+    private var bikeRouteToggle: Boolean = false
+
+    private var polyline_final: ArrayList<Polyline> = arrayListOf()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,22 +67,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-//        val bikeTrail = (activity as CoreActivity).bikeTrail
-//        val bikeTheft = (activity as CoreActivity).bikeTheft
-//        val bikeRack = (activity as CoreActivity).bikeRack
-
-
-
-
-
-//        println("debug: print ${value.map{it.groupValues[0]}.joinToString() }}")
-//        println("debug: bikeTheft ${bikeTheft}")
-//        println("debug: bikeRack ${bikeRack}")
-
-
-
-
 
         return root
     }
@@ -112,7 +101,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
-            addBikeRacks()
+            bikeRacksToggle = if(!bikeRacksToggle){
+                addBikeRacks()
+                true
+            }else{
+                mClusterManager.clearItems()
+                mClusterManager.cluster()
+                false
+            }
+
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
@@ -128,11 +125,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
-            addBikeRoutes()
+            bikeRouteToggle = if(!bikeRouteToggle){
+                addBikeRoutes()
+                true
+            }else{
+                for(i in polyline_final){
+                    i.remove()
+                }
+                false
+            }
+
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
-            addBikeTheft()
+            bikeTheftsToggle = if(!bikeTheftsToggle){
+                addBikeTheft()
+                true
+            }else{
+                mOverlay.remove()
+                false
+            }
+
         }
 
     }
@@ -172,11 +185,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private fun addBikeRoutes() {
         activity?.runOnUiThread{
             for(i in bikeRoute){
-                polylineOptions1 = PolylineOptions()
-                polylineOptions1.color(Color.rgb((0..255).random(),(0..255).random(),(0..255).random()))
-                polylineOptions1.width(10f)
-                polylineOptions1.addAll(i)
-                mMap.addPolyline(polylineOptions1)
+                polylineOptions = PolylineOptions()
+                polylineOptions.color(Color.rgb((0..255).random(),(0..255).random(),(0..255).random()))
+                polylineOptions.width(10f)
+                polylineOptions.addAll(i)
+                polyline_final.add(mMap.addPolyline(polylineOptions))
             }
 
 
@@ -216,7 +229,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener {
             for(j in latLngs){
 //                println("debug: j is ${j}")
                 val (long, lat) = j.drop(1).dropLast(1).split(", ")
-                println("debug: lat is ${lat} long is ${long}")
+
                 singleBikeRoute.add(LatLng(lat.toDouble(), long.toDouble()))
             }
             bikeRoute.add(singleBikeRoute)
