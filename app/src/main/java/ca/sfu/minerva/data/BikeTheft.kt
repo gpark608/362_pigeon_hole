@@ -1,6 +1,6 @@
 package ca.sfu.minerva.data
 
-data class Crime(
+data class BikeTheft(
     val id: Int,
     val count: Int,
     val hundredBlock: String,
