@@ -10,30 +10,40 @@ import ca.sfu.minerva.ui.profile.EditProfileActivity
 
 class CheckBoxDialog: DialogFragment(), DialogInterface.OnClickListener {
     private lateinit var editProfileActivity: EditProfileActivity
-    private lateinit var editTextProvince: EditText
-    private lateinit var bundle: Bundle
+    private lateinit var editText: EditText
     private lateinit var title: String
 
-    private val provinces = arrayOf("AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT", "N/A")
-    private var checked = 0
+    private var checked = -1
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         lateinit var checkBoxDialog: Dialog
         editProfileActivity = activity as EditProfileActivity
-        editTextProvince = editProfileActivity.findViewById(R.id.edit_text_province)
 
-        title = "Select Province"
+        val bundle = arguments
+        val choices = bundle?.getStringArray(EditProfileActivity.CHOICES)
+
+        when (bundle?.getString(EditProfileActivity.TITLE)) {
+            "province" -> {
+                title = "Select Province"
+                editText = editProfileActivity.findViewById(R.id.edit_text_province)
+            }
+            "gender" -> {
+                title = "Select Gender"
+                editText = editProfileActivity.findViewById(R.id.edit_text_gender)
+            }
+        }
+
         val builder = AlertDialog.Builder(requireActivity())
         builder.setView(view)
         builder.setTitle(title)
 
-        builder.setSingleChoiceItems(provinces, checked) { dialog, pos ->
+        builder.setSingleChoiceItems(choices, checked) { dialog, pos ->
             // update the selected item which is selected by the user so that it should be selected
             // when user opens the dialog next time and pass the instance to setSingleChoiceItems method
             checked = pos
 
             // now also update the TextView which previews the selected item
-            editTextProvince.setText(provinces[pos])
+            editText.setText(choices!![pos])
 
             // when selected an item the dialog should be closed with the dismiss method
             dialog.dismiss()
