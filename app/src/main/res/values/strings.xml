@@ -54,5 +54,16 @@
 
     <!-- Edit Profile Activity -->
     <string name="edit_profile">Edit Profile</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="postal_code">Postal Code</string>
+    <string name="city">City</string>
+    <string name="birthday">Birthday</string>
+    <string name="gender">Gender</string>
+    <string name="weight">Weight</string>
+    <string name="province">Province</string>
+    <string name="athlete_information">Athlete Information</string>
+    <string name="account_details">Account Details</string>
+    <string name="athlete_information_help">Used to calculate calories</string>
 
 </resources>
