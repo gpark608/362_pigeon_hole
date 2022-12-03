@@ -204,7 +204,9 @@
                         android:id="@+id/edit_text_gender"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textCapWords"
+                        android:text="@string/prefer_not_to_say"
+                        android:focusable="false"
+                        android:cursorVisible="false"
                         />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -216,13 +218,14 @@
                     android:layout_weight="1"
                     android:layout_marginStart="5dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:hint="@string/weight">
+                    android:hint="@string/weight_kg">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_weight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
+                        android:inputType="number"
+                        android:maxLength="3"
                         />
 
                 </com.google.android.material.textfield.TextInputLayout>
