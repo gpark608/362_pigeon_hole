@@ -135,6 +135,9 @@
                         android:id="@+id/edit_text_province"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="@string/none_selected"
+                        android:focusable="false"
+                        android:cursorVisible="false"
                         />
 
                 </com.google.android.material.textfield.TextInputLayout>

@@ -65,5 +65,6 @@
     <string name="athlete_information">Athlete Information</string>
     <string name="account_details">Account Details</string>
     <string name="athlete_information_help">Used to calculate calories</string>
+    <string name="none_selected">None Selected</string>
 
 </resources>
