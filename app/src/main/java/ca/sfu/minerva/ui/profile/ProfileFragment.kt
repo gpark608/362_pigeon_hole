@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -21,6 +22,7 @@ class ProfileFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private lateinit var btnEdit: Button
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor:SharedPreferences.Editor
@@ -36,6 +38,10 @@ class ProfileFragment : Fragment() {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        btnEdit = root.findViewById(R.id.button_edit)
+        btnEdit.setOnClickListener {
+            onClickEditProfile()
+        }
 
         sharedPreferences = activity?.getSharedPreferences("LoginInfo", AppCompatActivity.MODE_PRIVATE)!!
         editor = sharedPreferences.edit()
@@ -46,7 +52,6 @@ class ProfileFragment : Fragment() {
             editor.apply()
             val intent = Intent(activity, MainActivity::class.java)
             startActivity(intent)
-
         }
 
         return root
@@ -55,5 +60,10 @@ class ProfileFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun onClickEditProfile() {
+        val intent = Intent(activity, EditProfileActivity::class.java)
+        startActivity(intent)
     }
 }
