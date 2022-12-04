@@ -46,12 +46,10 @@ class HomeFragment : Fragment(), LocationListener {
     private lateinit var tvFullDate: TextView
     private lateinit var ivWeatherIcon: ImageView
     private lateinit var container: LinearLayout
-    private lateinit var btnChangeBackground: Button
     private lateinit var listview: ListView
     private lateinit var firestore: FirebaseFirestore
     private lateinit var eventList: ArrayList<Event>
     private lateinit var adapter: EventAdapter
-    private var background = 0
     private lateinit var locationManager: LocationManager
     private val apiKey: String = BuildConfig.W_API_KEY
 
@@ -87,9 +85,6 @@ class HomeFragment : Fragment(), LocationListener {
         tvFullDate.text = getFullDate()
         ivWeatherIcon = binding.ivWeatherIcon
         container = binding.container
-        btnChangeBackground = binding.btnChangeBackground
-        btnChangeBackground.setOnClickListener {changeBackground()}
-        container.setBackgroundResource(R.drawable.bg_one)
     }
 
     private suspend fun getWeatherAPICall(latLng: LatLng){
@@ -178,19 +173,7 @@ class HomeFragment : Fragment(), LocationListener {
         return sdf.format(d)
     }
 
-    private fun changeBackground() {
-        when(background){
-            0 -> {
-                container.setBackgroundResource(R.drawable.bg_two)
-                background = 1
-            }
-            1 -> {
-                container.setBackgroundResource(R.drawable.bg_one)
-                background = 0
-            }
 
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

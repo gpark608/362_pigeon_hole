@@ -75,20 +75,6 @@
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
-        android:background="#8500BCD4"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Change Background"
-            android:id="@+id/btnChangeBackground"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:background="#97CC86D1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="15dp"
