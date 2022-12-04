@@ -34,7 +34,6 @@ class ProfileFragment : Fragment() {
     private lateinit var textFullName: TextView
     private lateinit var btnLogOut: TextView
     private lateinit var btnEdit: Button
-    private lateinit var profilePicturePath: String
     private lateinit var profilePictureUri: Uri
     private lateinit var defaultProfilePicture: Drawable
 
@@ -76,12 +75,7 @@ class ProfileFragment : Fragment() {
     private fun loadUserData() {
         val firstName = sharedPreferences.getString(EditProfileActivity.FIRST_NAME, "")
         val lastName = sharedPreferences.getString(EditProfileActivity.LAST_NAME, "")
-        val profilePicturePathString = sharedPreferences.getString("profilePicturePath", null)
         val profilePictureUriString = sharedPreferences.getString("profilePictureUri", null)
-
-        if (profilePicturePathString != null) {
-            profilePicturePath = profilePicturePathString
-        }
 
         if (profilePictureUriString != null) {
             profilePictureUri = Uri.parse(profilePictureUriString)
