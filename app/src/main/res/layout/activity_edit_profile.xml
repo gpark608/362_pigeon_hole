@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
-                >
+                android:baselineAligned="false">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/text_field_city"
@@ -168,18 +168,19 @@
                 />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/text_field_birthday"
+                android:id="@+id/text_field_birthdate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:hint="@string/birthday">
+                android:hint="@string/birthdate">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_birthday"
+                    android:id="@+id/edit_text_birthdate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="date"
+                    android:focusable="false"
+                    android:cursorVisible="false"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>
