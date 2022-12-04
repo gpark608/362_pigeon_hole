@@ -400,7 +400,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             val locationTitle = "${i.javaClass.getMethod("getStreetName").invoke(i)} ${i.javaClass.getMethod("getStreetNumber").invoke(i)}"
             var locationSnippet = ""
             if(i.javaClass.getMethod("getSkytrainStationName").invoke(i).toString().isNotBlank()){
-                locationSnippet = i.javaClass.getMethod("getSkytrainStationName").invoke(i).toString()
+                locationSnippet = "${i.javaClass.getMethod("getSkytrainStationName").invoke(i)} Station"
             }
             bikeRacks.add(BikeRack(latLng, locationTitle, locationSnippet))
         }
