@@ -68,5 +68,7 @@
     <string name="athlete_information_help">Used to calculate calories</string>
     <string name="none_selected">None Selected</string>
     <string name="prefer_not_to_say">Prefer Not To Say</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
 
 </resources>
