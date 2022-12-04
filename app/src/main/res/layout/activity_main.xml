@@ -26,7 +26,7 @@
             android:id="@+id/editTextEmailLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/label_email"
+            android:hint="@string/email"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -44,7 +44,7 @@
             android:id="@+id/editTextPasswordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/label_password"
+            android:hint="@string/password"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
