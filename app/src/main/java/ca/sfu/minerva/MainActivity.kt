@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.ktor.network.sockets.*
+import kotlin.system.exitProcess
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,39 +41,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         checkPermission(this)
-        val connection = getConnectionType()
-        if(!connection){
+        if(!getConnectionType()){
             setContentView(R.layout.activity_main)
-            emailET = findViewById(R.id.editTextEmail)
-            passwordET = findViewById(R.id.editTextPassword)
-            btnLogin = findViewById(R.id.buttonLogin)
-            btnRegister = findViewById(R.id.buttonRegister)
-            btnContinue = findViewById(R.id.textViewGuest)
-            btnLogin.isClickable = false
-            btnRegister.isClickable = false
-            btnContinue.isClickable = false
-            Toast.makeText(this, "Can not use this app without WIFI or Mobile Data", Toast.LENGTH_SHORT).show()
-        }
-        else{
-            auth = Firebase.auth
-            sharedPreferences = this.getSharedPreferences("LoginInfo", MODE_PRIVATE)
-            editor = sharedPreferences.edit()
-            val email = sharedPreferences.getString(Helper.EMAIL, "")!!
-            val pass = sharedPreferences.getString(Helper.PASSWORD, "")!!
-            login(email, pass)
+            internetAlert()
         }
 
+        auth = Firebase.auth
+        sharedPreferences = this.getSharedPreferences("LoginInfo", MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+        val email = sharedPreferences.getString(Helper.EMAIL, "")!!
+        val pass = sharedPreferences.getString(Helper.PASSWORD, "")!!
+        login(email, pass)
+    }
 
-
-
-
-
-
-
-
-
-
-
+    private fun internetAlert(){
+        val alertDialogBuilder: androidx.appcompat.app.AlertDialog.Builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        alertDialogBuilder.setMessage("Internet connection is required. Check your Wifi or Mobile Data")
+        alertDialogBuilder.setTitle("Connection Failed")
+        alertDialogBuilder.setNegativeButton(
+            "ok"
+        ) { _, _ ->}
+        val alertDialog = alertDialogBuilder.create()
+        alertDialog.show()
     }
     private fun login(email: String, pass: String) {
         if (email.isNotEmpty() && pass.isNotEmpty()) {
@@ -91,17 +81,32 @@ class MainActivity : AppCompatActivity() {
         btnRegister = findViewById(R.id.buttonRegister)
         btnContinue = findViewById(R.id.textViewGuest)
         btnLogin.setOnClickListener {
-            val email = emailET.text.toString().trim()
-            val pass = passwordET.text.toString().trim()
-            auth(email, pass)
+            if(!getConnectionType()){
+                internetAlert()
+            }else{
+                val email = emailET.text.toString().trim()
+                val pass = passwordET.text.toString().trim()
+                auth(email, pass)
+            }
+
         }
 
         btnRegister.setOnClickListener {
-            register()
+            if(!getConnectionType()){
+                internetAlert()
+            }else{
+                register()
+            }
+
         }
 
         btnContinue.setOnClickListener {
-            startCoreActivity()
+            if(!getConnectionType()){
+                internetAlert()
+            }else{
+                startCoreActivity()
+            }
+
         }
     }
     private fun auth(email: String, pass: String){
