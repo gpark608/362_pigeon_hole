@@ -33,15 +33,25 @@ class EventAdapter (private val context: Context, var eventList: ArrayList<Event
         val btnAddToCalendar = view.findViewById(R.id.btnAddToCalendar) as Button
         val tvDesc = view.findViewById(R.id.tvDesc) as TextView
         val tvDate = view.findViewById(R.id.tvDate) as TextView
+        val tvLocation = view.findViewById(R.id.tvLocation) as TextView
 
         tvTitle.text = eventList[position].title
         tvDesc.text = eventList[position].description
+        tvLocation.text = eventList[position].location
 
-        val sdf = SimpleDateFormat("MMM d, hh:mm aa", Locale.getDefault())
+        val sdfDate = SimpleDateFormat("MMM d", Locale.getDefault())
+        val sdfTime = SimpleDateFormat("hh:mm aa", Locale.getDefault())
 
-        val startTime = sdf.format(eventList[position].startTime)
-        val endTime = sdf.format(eventList[position].endTime)
-        tvDate.text = "${startTime} - ${endTime}"
+        val startDate = sdfDate.format(eventList[position].startTime)
+        val endDate = sdfDate.format(eventList[position].endTime)
+        val startTime = sdfTime.format(eventList[position].startTime)
+        val endTime = sdfTime.format(eventList[position].endTime)
+
+        if(startDate.equals(endDate)){
+            tvDate.text = "${startDate}, ${startTime} - ${endTime}"
+        } else {
+            tvDate.text = "${startDate} - ${endDate}, ${startTime} - ${endTime}"
+        }
 
         btnAddToCalendar.setOnClickListener(){insertEventIntent(eventList[position])}
 
