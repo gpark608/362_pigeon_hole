@@ -58,7 +58,7 @@
     <string name="last_name">Last Name</string>
     <string name="postal_code">Postal Code</string>
     <string name="city">City</string>
-    <string name="birthday">Birthday</string>
+    <string name="birthdate">Birthdate</string>
     <string name="gender">Gender</string>
     <string name="weight_kg">Weight (kg)</string>
     <string name="weight_lb">Weight (lb)</string>
