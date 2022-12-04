@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import ca.sfu.minerva.CheckBoxDialog
+import ca.sfu.minerva.DatePickerDialog
 import ca.sfu.minerva.R
 import com.google.android.material.appbar.MaterialToolbar
 
@@ -24,6 +25,7 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var editTextProvince: EditText
     private lateinit var editTextGender: EditText
     private lateinit var editTextWeight: EditText
+    private lateinit var editTextBirthdate: EditText
 
     private val provinces = arrayOf("AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT")
     private val gender = arrayOf("M", "F", "Prefer Not To Say")
@@ -33,7 +35,7 @@ class EditProfileActivity : AppCompatActivity() {
         const val LAST_NAME = "last_name"
         const val CITY = "city"
         const val PROVINCE = "province"
-        const val BIRTHDAY = "birthday"
+        const val BIRTHDATE = "birthdate"
         const val GENDER = "gender"
         const val WEIGHT = "weight"
         const val EMAIL = "email"
@@ -58,6 +60,7 @@ class EditProfileActivity : AppCompatActivity() {
         editTextProvince = this.findViewById(R.id.edit_text_province)
         editTextGender = this.findViewById(R.id.edit_text_gender)
         editTextWeight = this.findViewById(R.id.edit_text_weight)
+        editTextBirthdate = this.findViewById(R.id.edit_text_birthdate)
 
         loadUserData()
 
@@ -66,10 +69,13 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         editTextProvince.setOnClickListener {
-            onClickCheckBox(editTextProvince)
+            onClickCheckBox(it)
         }
         editTextGender.setOnClickListener {
-            onClickCheckBox(editTextGender)
+            onClickCheckBox(it)
+        }
+        editTextBirthdate.setOnClickListener {
+            onClickDatePickerDialog()
         }
     }
 
@@ -106,6 +112,11 @@ class EditProfileActivity : AppCompatActivity() {
         checkBoxDialog.show(supportFragmentManager, "")
     }
 
+    private fun onClickDatePickerDialog() {
+        val datePickerDialog = DatePickerDialog()
+        datePickerDialog.show(supportFragmentManager, "")
+    }
+
     private fun loadUserData() {
         val firstName = sharedPreferences.getString(FIRST_NAME, "")
         val lastName = sharedPreferences.getString(LAST_NAME, "")
@@ -113,6 +124,7 @@ class EditProfileActivity : AppCompatActivity() {
         val province = sharedPreferences.getString(PROVINCE, "")
         val gender = sharedPreferences.getString(GENDER, "")
         val weight = sharedPreferences.getString(WEIGHT, "")
+        val birthdate = sharedPreferences.getString(BIRTHDATE, "")
 
         editTextFirstName.setText(firstName)
         editTextLastName.setText(lastName)
@@ -120,7 +132,7 @@ class EditProfileActivity : AppCompatActivity() {
         editTextProvince.setText(province)
         editTextGender.setText(gender)
         editTextWeight.setText(weight)
-
+        editTextBirthdate.setText(birthdate)
     }
 
     private fun saveUserData() {
@@ -132,6 +144,7 @@ class EditProfileActivity : AppCompatActivity() {
         val province = editTextProvince.text.toString()
         val gender = editTextGender.text.toString()
         val weight = editTextWeight.text.toString()
+        val birthdate = editTextBirthdate.text.toString()
 
         editor.putString(FIRST_NAME, firstName)
         editor.putString(LAST_NAME, lastName)
@@ -139,6 +152,7 @@ class EditProfileActivity : AppCompatActivity() {
         editor.putString(PROVINCE, province)
         editor.putString(GENDER, gender)
         editor.putString(WEIGHT, weight)
+        editor.putString(BIRTHDATE, birthdate)
 
         editor.apply()
     }
