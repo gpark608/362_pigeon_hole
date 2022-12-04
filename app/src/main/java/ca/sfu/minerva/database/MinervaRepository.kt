@@ -105,4 +105,12 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
         }
         return result
     }
+
+    //----------------
+    fun deleteFavouriteLocation(data: FavouriteLocation){
+        CoroutineScope(IO).launch {
+            databaseDao.deleteFavouriteLocationFromName(data.name)
+        }
+    }
+
 }

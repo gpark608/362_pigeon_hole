@@ -58,7 +58,7 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
             .findFragmentById(R.id.POIMap) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        prefs = this.getSharedPreferences(R.string.shared_preference_key.toString(), Context.MODE_PRIVATE)
+        //prefs = this.getSharedPreferences(R.string.shared_preference_key.toString(), Context.MODE_PRIVATE)
         optionList = ArrayList()
         poiOptionListView = findViewById(R.id.poiListView)
         poiListAdapter = PoiListAdapter(this, optionList)
