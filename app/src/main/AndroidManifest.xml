@@ -19,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Minerva"
         tools:targetApi="31">
+        <service android:name="ca.sfu.minerva.util.TrackingService" />
         <activity
             android:name=".CoreActivity"
             android:exported="false"
