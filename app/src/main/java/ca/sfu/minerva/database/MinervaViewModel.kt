@@ -2,9 +2,11 @@ package ca.sfu.minerva.database
 
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.flow.collect
 import java.lang.IllegalArgumentException
 
 class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
@@ -15,6 +17,7 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
     val RecyclingCentreDataLive: LiveData<List<RecyclingCenter>> = repository.RecyclingCenterData.asLiveData()
     val BikeLocationDataLive: LiveData<List<BikeLocation>> = repository.BikeLocationData.asLiveData()
     val FavouriteLocationDataLive: LiveData<List<FavouriteLocation>> = repository.FavouriteLocationData.asLiveData()
+    var favouritesActive: Boolean = false
 
     fun insertBikeRentalPlace(data: BikeRentalPlace){
         repository.insertBikeRentalPlace(data)
@@ -42,6 +45,10 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
 
     fun insertFavouriteLocation(data: FavouriteLocation){
         repository.insertFavouriteLocation(data)
+    }
+
+    fun deleteFavouriteLocation(data: FavouriteLocation){
+        repository.deleteFavouriteLocation(data)
     }
 
 }
