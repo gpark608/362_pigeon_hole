@@ -27,7 +27,7 @@ class DatePickerDialog: DialogFragment(), DatePickerDialog.OnDateSetListener {
 
         datePickerDialog = DatePickerDialog(
             editProfileActivity,
-            R.style.`Theme.DatePickerDialog`,
+            R.style.CustomDatePickerDialog,
             this,
             currentYear - 22,
             currentMonth,

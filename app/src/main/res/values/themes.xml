@@ -25,7 +25,7 @@
         <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
-    <style name="Theme.DatePickerDialog" parent="ThemeOverlay.AppCompat.Dialog">
+    <style name="CustomDatePickerDialog" parent="ThemeOverlay.AppCompat.Dialog">
         <item name="colorAccent">@color/ocean_green</item>                   <!--header background-->
         <item name="android:windowBackground">@color/white</item>     <!--calendar background-->
         <item name="android:colorControlActivated">@color/ocean_green</item> <!--selected day-->
