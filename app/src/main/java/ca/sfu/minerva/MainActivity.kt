@@ -3,7 +3,6 @@ package ca.sfu.minerva
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -11,14 +10,13 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
-
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.getSystemService
+import ca.sfu.minerva.util.Helper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -59,8 +57,8 @@ class MainActivity : AppCompatActivity() {
             auth = Firebase.auth
             sharedPreferences = this.getSharedPreferences("LoginInfo", MODE_PRIVATE)
             editor = sharedPreferences.edit()
-            val email = sharedPreferences.getString("email", "")!!
-            val pass = sharedPreferences.getString("pass", "")!!
+            val email = sharedPreferences.getString(Helper.EMAIL, "")!!
+            val pass = sharedPreferences.getString(Helper.PASSWORD, "")!!
             login(email, pass)
         }
 
@@ -110,8 +108,8 @@ class MainActivity : AppCompatActivity() {
         if(email.isNotEmpty() && pass.isNotEmpty()){
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
                 if (it.isSuccessful) {
-                    editor.putString("email", email)
-                    editor.putString("pass", pass)
+                    editor.putString(Helper.EMAIL, email)
+                    editor.putString(Helper.PASSWORD, pass)
                     editor.apply()
                     startCoreActivity()
                 }else{
