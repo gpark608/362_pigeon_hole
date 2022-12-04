@@ -7,6 +7,9 @@ import java.lang.reflect.Type
 import java.util.ArrayList
 
 object Helper {
+    const val EMAIL = "email"
+    const val PASSWORD = "password"
+
     private fun getTimeInSeconds(start: Long, end: Long): Double {
         return ((end - start) / 1000).toDouble()
     }

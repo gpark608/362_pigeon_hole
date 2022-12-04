@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import ca.sfu.minerva.CoreActivity
+import ca.sfu.minerva.FavouritePoiActivity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -41,14 +43,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var mClusterManager: ClusterManager<BikeRack>
     private lateinit var bikeRacks: ArrayList<BikeRack>
     private lateinit var bikeThefts: ArrayList<WeightedLatLng>
-    private lateinit var bikeRoute1: ArrayList<LatLng>
-    private lateinit var bikeRoute2: ArrayList<LatLng>
+    private lateinit var bikeRoute: ArrayList<ArrayList<LatLng>>
+
     private lateinit var mProvider: HeatmapTileProvider
     private lateinit var mOverlay: TileOverlay
-    private lateinit var polylineOptions1: PolylineOptions
-    private lateinit var polylineOptions2: PolylineOptions
+    private lateinit var polylineOptions: PolylineOptions
+
     private lateinit var mMap: GoogleMap
 
+
+    private var bikeRacksToggle: Boolean = false
+    private var bikeTheftsToggle: Boolean = false
+    private var bikeRouteToggle: Boolean = false
+
+    private var polyline_final: ArrayList<Polyline> = arrayListOf()
     private lateinit var database: MinervaDatabase
     private lateinit var databaseDao: MinervaDatabaseDao
     private lateinit var repository: MinervaRepository
@@ -62,7 +70,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var poiMarkerOption: MarkerOptions
     private lateinit var poiMarkers: ArrayList<Marker>
     private lateinit var buttonList: Button
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,9 +119,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mClusterManager = ClusterManager(activity, mMap)
         mMap.setOnCameraIdleListener(mClusterManager);
 
-        fakeBikeRackList()
-        fakeBikeTheftList()
-        fakeBikeRouteList()
+        bikeRackList()
+        bikeTheftList()
+        bikeRouteList()
 
         initLocationManager()
 
@@ -141,7 +148,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
-            addBikeRacks()
+            bikeRacksToggle = if(!bikeRacksToggle){
+                addBikeRacks()
+                true
+            }else{
+                mClusterManager.clearItems()
+                mClusterManager.cluster()
+                false
+            }
+
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
@@ -157,11 +172,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
-            addBikeRoutes()
+            bikeRouteToggle = if(!bikeRouteToggle){
+                addBikeRoutes()
+                true
+            }else{
+                for(i in polyline_final){
+                    i.remove()
+                }
+                false
+            }
+
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
-            addBikeTheft()
+            bikeTheftsToggle = if(!bikeTheftsToggle){
+                addBikeTheft()
+                true
+            }else{
+                mOverlay.remove()
+                false
+            }
+
         }
 
     }
@@ -334,13 +365,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             )
 
             val startPoints = floatArrayOf(
-                0.1f, 0.2f, 0.3f, 0.4f, 0.6f, 1.0f
+                0.001f, 0.002f, 0.003f, 0.004f, 0.006f, 0.01f
             )
 
             val gradient = Gradient(colors, startPoints)
 
             mProvider = HeatmapTileProvider.Builder()
-                .weightedData(bikeThefts).radius(30).gradient(gradient).opacity(0.5)
+                .weightedData(bikeThefts).radius(50).gradient(gradient).opacity(0.5)
                 .build()
 
             mOverlay = mMap.addTileOverlay(TileOverlayOptions().tileProvider(mProvider))!!
@@ -349,71 +380,72 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
     private fun addBikeRoutes() {
         activity?.runOnUiThread{
-            polylineOptions1 = PolylineOptions()
-            polylineOptions2 = PolylineOptions()
-            polylineOptions1.color(Color.BLUE)
-            polylineOptions1.width(15f)
-            polylineOptions2.color(Color.RED)
-            polylineOptions1.width(15f)
+            for(i in bikeRoute){
+                polylineOptions = PolylineOptions()
+                polylineOptions.color(Color.rgb((0..255).random(),(0..255).random(),(0..255).random()))
+                polylineOptions.width(10f)
+                polylineOptions.addAll(i)
+                polyline_final.add(mMap.addPolyline(polylineOptions))
+            }
 
-            polylineOptions1.addAll(bikeRoute1)
-            polylineOptions2.addAll(bikeRoute2)
 
-            mMap.addPolyline(polylineOptions1)
-            mMap.addPolyline(polylineOptions2)
         }
     }
 
-    private fun fakeBikeRackList(){
+    private fun bikeRackList(){
         bikeRacks = ArrayList()
-        for (i in 0..9) {
-            val latLng = LatLng((49.267502010791375 + i * 0.001 * (0..5).random()), (-123.00311497930385 + i * 0.001 * (0..5).random()))
-            bikeRacks.add(BikeRack(latLng))
+        val bikeRackList = (activity as CoreActivity).bikeRack
+        for (i in bikeRackList) {
+            val latLng = LatLng(i.javaClass.getMethod("getLatitude").invoke(i).toString().toDouble(), i.javaClass.getMethod("getLongitude").invoke(i).toString().toDouble())
+            val locationTitle = "${i.javaClass.getMethod("getStreetName").invoke(i)} ${i.javaClass.getMethod("getStreetNumber").invoke(i)}"
+            var locationSnippet = ""
+            if(i.javaClass.getMethod("getSkytrainStationName").invoke(i).toString().isNotBlank()){
+                locationSnippet = "${i.javaClass.getMethod("getSkytrainStationName").invoke(i)} Station"
+            }
+            bikeRacks.add(BikeRack(latLng, locationTitle, locationSnippet))
         }
     }
 
-    private fun fakeBikeTheftList(){
+    private fun bikeTheftList(){
         bikeThefts = ArrayList()
-        for (i in 0..9) {
-            val latLng = LatLng((49.267502010791375 + (i * 0.0001 * (0..5).random())), (-123.00311497930385 + (i * 0.0001 * (0..5).random())))
-            bikeThefts.add(WeightedLatLng(latLng, (0..10).random().toDouble()))
+        val bikeTheftList = (activity as CoreActivity).bikeTheft
+        for (i in bikeTheftList) {
+            val latLng = LatLng(i.javaClass.getMethod("getLatitude").invoke(i).toString().toDouble(), i.javaClass.getMethod("getLongitude").invoke(i).toString().toDouble())
+            val count = i.javaClass.getMethod("getCount").invoke(i).toString().toDouble()
+            bikeThefts.add(WeightedLatLng(latLng, count))
+
         }
     }
 
-    private fun fakeBikeRouteList(){
-        bikeRoute1 = ArrayList()
-        bikeRoute1.add(LatLng(49.27249601539955, -123.13048439225132))
-        bikeRoute1.add(LatLng(49.27245498146834, -123.1305055947476))
-        bikeRoute1.add(LatLng(49.27236202151856, -123.13063695695938))
-        bikeRoute1.add(LatLng(49.27232556611822, -123.13066531295438))
-        bikeRoute1.add(LatLng(49.2722931088385, -123.13065808564242))
-        bikeRoute1.add(LatLng(49.27176081294581, -123.1298408652264))
-        bikeRoute1.add(LatLng(49.27173828084447, -123.12980487311506))
-        bikeRoute1.add(LatLng(49.27172186503857, -123.12976685704314))
-        bikeRoute1.add(LatLng(49.27170931828907, -123.12972782974923))
-        bikeRoute1.add(LatLng(49.27170208235533, -123.12968473632525))
-        bikeRoute1.add(LatLng(49.271697810987014, -123.12964425708918))
-        bikeRoute1.add(LatLng(49.27169786096204, -123.12959970910934))
-        bikeRoute1.add(LatLng(49.27170447279747, -123.12955767199581))
-        bikeRoute1.add(LatLng(49.27171592892096, -123.12952732277496))
-        bikeRoute1.add(LatLng(49.271869347312794, -123.12929364603939))
-        bikeRoute1.add(LatLng(49.27189775429988, -123.1292243477885))
-        bikeRoute1.add(LatLng(49.271882265573744, -123.12916150864038))
-        bikeRoute1.add(LatLng(49.27128312647653, -123.12823823821586))
-        bikeRoute1.add(LatLng(49.27101014493617, -123.12781758468621))
-        bikeRoute1.add(LatLng(49.271006815076554, -123.12781011988474))
+    private fun bikeRouteList(){
+        bikeRoute = ArrayList()
 
-        bikeRoute2 = ArrayList()
-        bikeRoute2.add(LatLng(49.308080088698574, -123.147076521593))
-        bikeRoute2.add(LatLng(49.30848086458077, -123.14633517216237))
-        bikeRoute2.add(LatLng(49.30913795492011, -123.14616240078895))
-        bikeRoute2.add(LatLng(49.30968030896991, -123.14638240459482))
-        bikeRoute2.add(LatLng(49.31002241366392, -123.14686390142336))
-        bikeRoute2.add(LatLng(49.31070795224121, -123.14677857775216))
-        bikeRoute2.add(LatLng(49.31090897457683, -123.14590555457607))
-        bikeRoute2.add(LatLng(49.311280688887194, -123.14555720075641))
-        bikeRoute2.add(LatLng(49.31196639214391, -123.14534081164526))
-        bikeRoute2.add(LatLng(49.31193865560781, -123.144908183308))
+
+        val bikeTrail = (activity as CoreActivity).bikeTrail
+        val reg = "(\\[\\D?\\d*.\\d*, \\D?\\d*.\\d*\\])".toRegex()
+        for(i in bikeTrail){
+            val matches = reg.findAll(i.javaClass.getMethod("getGeom").invoke(i).toString())
+            val latLngs = matches.map{it.value}.toList()
+            val singleBikeRoute:ArrayList<LatLng> = ArrayList()
+            for(j in latLngs){
+//                println("debug: j is ${j}")
+                val (long, lat) = j.drop(1).dropLast(1).split(", ")
+
+                singleBikeRoute.add(LatLng(lat.toDouble(), long.toDouble()))
+            }
+            bikeRoute.add(singleBikeRoute)
+        }
+
+
+
+
+
+
+
+
+
+
+
     }
 
     /*

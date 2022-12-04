@@ -1,5 +1,4 @@
 package ca.sfu.minerva.ui.home
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -39,10 +38,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
-
-
 class HomeFragment : Fragment(), LocationListener {
-
     private var _binding: FragmentHomeBinding? = null
     private lateinit var tvTemperature: TextView
     private lateinit var tvCity: TextView
@@ -57,11 +53,9 @@ class HomeFragment : Fragment(), LocationListener {
     private lateinit var locationManager: LocationManager
     private val apiKey: String = BuildConfig.W_API_KEY
 
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -69,26 +63,19 @@ class HomeFragment : Fragment(), LocationListener {
     ): View {
         val homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
         firestore = Firebase.firestore
         eventList = ArrayList()
-
-
         initializeTextViews()
         checkPermission()
-
         CoroutineScope(Dispatchers.IO).launch{
             if (container != null) {
                 getEventsAPICall(container.context)
             }
         }
-
         return root
     }
-
     private fun initializeTextViews() {
         tvTemperature = binding.tvTemperature
         tvCity = binding.tvCity
@@ -114,18 +101,15 @@ class HomeFragment : Fragment(), LocationListener {
                     "&APPID=" + apiKey
             val response: String = client.get(WEATHER_URL)
             println("WHY $latLng")
-
             //GET WEATHER DESCRIPTION
             val jsonObj = JSONObject(response)
             val weather = jsonObj.getJSONArray("weather")
             val weatherObj = weather.getJSONObject(0)
             val description = weatherObj.getString("main")
             updateWeatherIcon(ivWeatherIcon, description);
-
             //GET TEMPERATURE
             val main = jsonObj.getJSONObject("main")
             val temp = main.getDouble("temp").toInt().toString() + "°"
-
             //GET CITY NAME
             val city = jsonObj.getString("name")
             updateTextView(tvTemperature, "$description $temp $city")
@@ -133,42 +117,38 @@ class HomeFragment : Fragment(), LocationListener {
             updateTextView(tvCity, city)
         }
     }
-
     private suspend fun getEventsAPICall(context: Context) {
         withContext(Dispatchers.IO){
             firestore.collection("events")
                 .orderBy("startTime")
                 .limit(10)
                 .get().addOnSuccessListener { events ->
-                for (event in events) {
-                    val id = event["id"].toString()
-                    val title = event["title"].toString()
-                    val description = event["description"].toString()
-                    val startTime = (event["startTime"] as Timestamp).toDate()
-                    val endTime = (event["endTime"] as Timestamp).toDate()
-                    val g = event["geopoint"] as GeoPoint
-                    val geopoint = LatLng(g.latitude, g.longitude);
-                    val location = event["location"].toString()
-                    var allDay = false
-                    if(event["allDay"] == 1){
-                        allDay = true
+                    for (event in events) {
+                        val id = event["id"].toString()
+                        val title = event["title"].toString()
+                        val description = event["description"].toString()
+                        val startTime = (event["startTime"] as Timestamp).toDate()
+                        val endTime = (event["endTime"] as Timestamp).toDate()
+                        val g = event["geopoint"] as GeoPoint
+                        val geopoint = LatLng(g.latitude, g.longitude);
+                        val location = event["location"].toString()
+                        var allDay = false
+                        if(event["allDay"] == 1){
+                            allDay = true
+                        }
+                        eventList.add(Event(id, title, description, startTime, endTime, geopoint, location, allDay))
                     }
-                    eventList.add(Event(id, title, description, startTime, endTime, geopoint, location, allDay))
-                }
                     adapter = EventAdapter(context, eventList)
                     listview = binding.listview
                     listview.adapter = adapter
-            }
+                }
         }
     }
-
-
     private suspend fun updateTextView(tv: TextView, input: String){
         withContext(Dispatchers.Main){
             tv.text = input
         }
     }
-
     private suspend fun updateWeatherIcon(view: ImageView, value: String) {
         withContext(Dispatchers.Main){
             when (value) {
@@ -182,24 +162,23 @@ class HomeFragment : Fragment(), LocationListener {
             }
         }
     }
-
     private fun getWeekday(): String? {
         val sdf = SimpleDateFormat("EEEE", Locale.getDefault())
         val d = Date()
         return sdf.format(d)
     }
-
     private fun getFullDate(): String? {
         val sdf = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
         val d = Date()
         return sdf.format(d)
     }
 
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
     override fun onLocationChanged(location: Location) {
         val lat = location.latitude
         val lng = location.longitude
@@ -208,7 +187,6 @@ class HomeFragment : Fragment(), LocationListener {
             getWeatherAPICall(latLng)
         }
     }
-
     /*
     Verifies that location permissions were granted then calls initLocationManager
      */
@@ -220,20 +198,17 @@ class HomeFragment : Fragment(), LocationListener {
             initLocationManager()
         }
     }
-
     /*
     Verifies permissions were granted and calls initLocationManager
      */
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-            if (requestCode == 0) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    initLocationManager()
-                }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                initLocationManager()
             }
         }
-
+    }
     /*
     Selects the best type of provider based on locationManager and attaches listener to onLocationChange function
      */
@@ -246,7 +221,6 @@ class HomeFragment : Fragment(), LocationListener {
             val provider : String? = locationManager.getBestProvider(criteria, true)
             if(provider != null) {
                 val location = locationManager.getLastKnownLocation(provider)
-
                 if(location != null) {
                     onLocationChanged(location)
                 }else {
@@ -261,5 +235,4 @@ class HomeFragment : Fragment(), LocationListener {
         } catch (e: SecurityException) {
         }
     }
-
 }
