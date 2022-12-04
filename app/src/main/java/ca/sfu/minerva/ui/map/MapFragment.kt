@@ -397,7 +397,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         val bikeRackList = (activity as CoreActivity).bikeRack
         for (i in bikeRackList) {
             val latLng = LatLng(i.javaClass.getMethod("getLatitude").invoke(i).toString().toDouble(), i.javaClass.getMethod("getLongitude").invoke(i).toString().toDouble())
-            bikeRacks.add(BikeRack(latLng))
+            val locationTitle = "${i.javaClass.getMethod("getStreetName").invoke(i)} ${i.javaClass.getMethod("getStreetNumber").invoke(i)}"
+            var locationSnippet = ""
+            if(i.javaClass.getMethod("getSkytrainStationName").invoke(i).toString().isNotBlank()){
+                locationSnippet = i.javaClass.getMethod("getSkytrainStationName").invoke(i).toString()
+            }
+            bikeRacks.add(BikeRack(latLng, locationTitle, locationSnippet))
         }
     }
 

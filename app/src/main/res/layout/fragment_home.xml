@@ -7,7 +7,6 @@
     tools:context=".ui.home.HomeFragment"
     android:id="@+id/container"
     android:orientation="vertical">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,8 +23,6 @@
             android:layout_marginStart="13dp"
             android:layout_marginEnd="13dp"
             android:gravity="center_vertical">
-
-
             <TextView
                 android:id="@+id/tvWeekday"
                 android:layout_width="0dp"
@@ -33,7 +30,6 @@
                 android:layout_weight="1"
                 android:textColor="@android:color/white"
                 android:textSize="30sp" />
-
             <ImageView
                 android:id="@+id/ivWeatherIcon"
                 android:layout_width="35dp"
@@ -41,7 +37,6 @@
                 android:scaleType="fitEnd"
                 android:layout_marginEnd="5dp"
                 app:srcCompat="@drawable/weather_unknown" />
-
             <TextView
                 android:id="@+id/tvTemperature"
                 android:layout_width="wrap_content"
@@ -50,9 +45,7 @@
                 android:textAlignment="viewEnd"
                 android:textColor="@android:color/white"
                 android:textSize="30sp" />
-
         </LinearLayout>
-
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -61,7 +54,6 @@
             android:layout_marginEnd="13dp"
             android:textColor="@android:color/white"
             android:layout_marginBottom="13dp">
-
             <TextView
                 android:id="@+id/tvFullDate"
                 android:layout_width="0dp"
@@ -70,7 +62,6 @@
                 android:layout_marginStart="2dp"
                 android:textColor="@android:color/white"
                 android:text="@string/unknown" />
-
             <TextView
                 android:id="@+id/tvCity"
                 android:layout_width="0dp"
@@ -83,8 +74,21 @@
 
         </LinearLayout>
     </LinearLayout>
-
     <LinearLayout
+        android:background="#8500BCD4"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change Background"
+            android:id="@+id/btnChangeBackground"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:background="#97CC86D1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="15dp"
@@ -98,7 +102,6 @@
             >
 
         </TextView>
-
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -106,5 +109,4 @@
             >
         </ListView>
     </LinearLayout>
-
 </LinearLayout>
