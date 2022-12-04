@@ -25,4 +25,11 @@
         <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
+    <style name="Theme.DatePickerDialog" parent="ThemeOverlay.AppCompat.Dialog">
+        <item name="colorAccent">@color/ocean_green</item>                   <!--header background-->
+        <item name="android:windowBackground">@color/white</item>     <!--calendar background-->
+        <item name="android:colorControlActivated">@color/ocean_green</item> <!--selected day-->
+        <item name="android:textColorPrimary">@color/raisin_black</item> <!--days of the month-->
+        <item name="android:textColorSecondary">@color/raisin_black</item>    <!--days of the week-->
+    </style>
 </resources>
