@@ -55,22 +55,6 @@
                 android:layout_margin="5dp"/>
 
             <Button
-                android:id="@+id/buttonEcoStore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Eco-Stores"
-                android:layout_margin="5dp"/>
-
-            <Button
-                android:id="@+id/buttonRecyclingCenter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Recycling Centers"
-                android:layout_margin="5dp"/>
-
-            <Button
                 android:id="@+id/buttonFavourites"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
