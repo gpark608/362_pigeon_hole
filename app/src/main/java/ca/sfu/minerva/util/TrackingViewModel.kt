@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class MapViewModel: ViewModel(), ServiceConnection {
+class TrackingViewModel: ViewModel(), ServiceConnection {
     private var mapDataHandler: MapDataHandler = MapDataHandler(Looper.getMainLooper())
     private val _mapBundle = MutableLiveData<Bundle>()
 

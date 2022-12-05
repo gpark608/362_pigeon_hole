@@ -110,7 +110,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun auth(email: String, pass: String){
-        startCoreActivity()
         if(email.isNotEmpty() && pass.isNotEmpty()){
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
                 if (it.isSuccessful) {

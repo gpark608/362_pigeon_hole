@@ -7,10 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Criteria
-import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.database.BikeRack
 import ca.sfu.minerva.databinding.ActivityBikeMapBinding
 import ca.sfu.minerva.util.Helper
-import ca.sfu.minerva.util.MapViewModel
+import ca.sfu.minerva.util.TrackingViewModel
 import ca.sfu.minerva.util.TrackingService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -31,7 +28,6 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
-import com.google.rpc.Help
 
 
 class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback  {
@@ -39,7 +35,7 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback  {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityBikeMapBinding
 
-    private lateinit var mapViewModel: MapViewModel
+    private lateinit var mapViewModel: TrackingViewModel
     private lateinit var serviceIntent: Intent
     private var isBind = false
 
@@ -73,7 +69,7 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback  {
         setContentView(binding.root)
 
         serviceIntent = Intent(this, TrackingService::class.java)
-        mapViewModel = ViewModelProvider(this)[MapViewModel::class.java]
+        mapViewModel = ViewModelProvider(this)[TrackingViewModel::class.java]
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment

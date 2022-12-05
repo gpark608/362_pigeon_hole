@@ -15,7 +15,10 @@ import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.Date
 
 class TrackingService: Service(), LocationListener {
     private lateinit var locationManager: LocationManager
@@ -79,22 +82,24 @@ class TrackingService: Service(), LocationListener {
     override fun onLocationChanged(location: Location) {
         println("DEBUG: Location Changed")
         // add locations
-        val lat = location.latitude
-        val lng = location.longitude
-        val latLng = LatLng(lat, lng)
-        locationList.add(latLng)
+        CoroutineScope(IO).launch {
+            val lat = location.latitude
+            val lng = location.longitude
+            val latLng = LatLng(lat, lng)
+            locationList.add(latLng)
 
-        if (::startLocation.isInitialized) {
-            distance += Helper.metersToMiles(startLocation.distanceTo(location))
-            speed = location.speed
-            altitude = Helper.metersToMiles(location.altitude.toFloat()).toDouble()
-        } else {
-            // initialize the start location
-            startLocation = location
+            if (::startLocation.isInitialized) {
+                distance += Helper.metersToMiles(startLocation.distanceTo(location))
+                speed = location.speed
+                altitude = Helper.metersToMiles(location.altitude.toFloat()).toDouble()
+            } else {
+                // initialize the start location
+                startLocation = location
+            }
+
+            // send data to handler
+            sendMapData()
         }
-
-        // send data to handler
-        sendMapData()
     }
 
     private fun sendMapData() {
