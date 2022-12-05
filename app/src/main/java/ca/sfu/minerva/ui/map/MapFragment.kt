@@ -221,10 +221,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             //TODO: add action here
         }
 
-        requireActivity().findViewById<Button>(R.id.buttonRecyclingCenter)?.setOnClickListener {
-            //TODO: add action here
-        }
-
         requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
             bikeRouteToggle = if(!bikeRouteToggle){
                 addBikeRoutes()
