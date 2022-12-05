@@ -4,20 +4,20 @@
         app:title="Preferences">
 
         <ListPreference
-            app:entries="@array/units_of_measure"
-            app:entryValues="@array/units_of_measure"
             app:iconSpaceReserved="false"
             app:key="units_of_measure"
-            app:summary="Metric"
+            app:entries="@array/units_of_measure"
+            app:entryValues="@array/units_of_measure"
+            app:summary="%s"
             app:title="Units of Measure" />
 
 
         <ListPreference
+            app:iconSpaceReserved="false"
+            app:key="units_of_weight"
             app:entries="@array/units_of_weight"
             app:entryValues="@array/units_of_weight"
-            app:iconSpaceReserved="false"
-            app:key="unit_of_weight"
-            app:summary="Kg"
+            app:summary="%s"
             app:title="Units of Weight" />
 
     </PreferenceCategory>
