@@ -159,7 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mMap.setOnMapLongClickListener(this)
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.setPadding(0,600,0,700)
+        mMap.setPadding(0,600,0,800)
 
         currentBikeLocationMarkerOption = MarkerOptions()
 
