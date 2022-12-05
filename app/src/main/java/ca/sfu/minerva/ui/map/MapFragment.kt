@@ -3,6 +3,7 @@ package ca.sfu.minerva.ui.map
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.location.*
 import android.os.Bundle
@@ -11,12 +12,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ca.sfu.minerva.CoreActivity
-import ca.sfu.minerva.FavouritePoiActivity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.CoreActivity
 import ca.sfu.minerva.R
 import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.FragmentMapBinding
@@ -25,12 +27,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapLongClickListener {
 
@@ -51,6 +54,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
     private lateinit var mMap: GoogleMap
 
+    // Bottom Sheet
+    private lateinit var bottomSheetView: ConstraintLayout
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var textViewTitle: TextView
+    private lateinit var textViewAddress: TextView
+    private lateinit var textViewBikeRacks: TextView
+    private var isBikeRackSelected = false
 
     private var bikeRacksToggle: Boolean = false
     private var bikeTheftsToggle: Boolean = false
@@ -89,6 +99,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        textViewTitle = root.findViewById(R.id.text_title)
+        textViewAddress = root.findViewById(R.id.text_address)
+        textViewBikeRacks = root.findViewById(R.id.text_bike_racks)
+        bottomSheetView = root.findViewById(R.id.bottomSheet)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
+        setBottomSheetVisibility(false)
+
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -105,11 +122,28 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         poiMarkers = ArrayList()
         buttonList = root.findViewById(R.id.buttonActivateList)
 
-
-
-
-
         return root
+    }
+
+    private fun onClickMarker(bikeRack: BikeRack) {
+        val lat = bikeRack.position.latitude
+        val lng = bikeRack.position.longitude
+
+        val geoCoder = Geocoder(context)
+        val matches = geoCoder.getFromLocation(lat, lng, 1)
+        val bestMatch = if (matches.isEmpty()) null else matches[0]
+
+        textViewTitle.text = "Bike Rack - ${bikeRack.title}"
+        textViewAddress.text = bestMatch!!.getAddressLine(0).toString()
+        textViewBikeRacks.text = bikeRack.getNumberOfRacks().toString()
+
+        isBikeRackSelected = true
+        setBottomSheetVisibility(true)
+    }
+
+    private fun setBottomSheetVisibility(isVisible: Boolean) {
+        val updatedState = if (isVisible) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehavior.state = updatedState
     }
 
     override fun onDestroyView() {
@@ -125,7 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mMap.setOnMapLongClickListener(this)
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.setPadding(0,700,0,0)
+        mMap.setPadding(0,600,0,800)
 
         currentBikeLocationMarkerOption = MarkerOptions()
 
@@ -144,11 +178,39 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         initLocationManager()
 
+        mClusterManager.setOnClusterItemClickListener { item ->
+            onClickMarker(item)
+            false
+        }
+        mMap.setOnMapClickListener {
+            setBottomSheetVisibility(false)
+        }
 
         favouritesList()
 
         if(viewModel.favouritesActive)
             addFavouritesToMap()
+
+        requireActivity().findViewById<ImageView>(R.id.image_share).setOnClickListener {
+            if (isBikeRackSelected) {
+                val sharingIntent = Intent(Intent.ACTION_SEND)
+
+                // type of the content to be shared
+                sharingIntent.type = "text/plain"
+
+                // subject of the content. you can share anything
+                val shareSubject = textViewTitle.text.toString()
+                // passing subject of the content
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubject)
+
+                // Body of the content
+                val shareBody = textViewAddress.text.toString()
+                // passing body of the content
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+
+                startActivity(Intent.createChooser(sharingIntent, "Share via"))
+            }
+        }
 
         requireActivity().findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {
             if(!viewModel.favouritesActive){
@@ -167,6 +229,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
+            onToggle(it as Button)
+            val btnBikeTheft = requireActivity().findViewById<Button>(R.id.buttonBikeTheft)
+            // only allow the Bike Theft button to be toggled if the
+            // Bike Racks button is toggled and un-toggle Bike Theft
+            // button if toggled when Bike Racks button is toggled
+            btnBikeTheft.isEnabled = it.isSelected
+            if (!it.isSelected && btnBikeTheft.isSelected) {
+                btnBikeTheft.callOnClick()
+            }
+
             bikeRacksToggle = if(!bikeRacksToggle){
                 addBikeRacks()
                 true
@@ -179,18 +251,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
+            onToggle(it as Button)
             //TODO: add action here
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRepair)?.setOnClickListener {
-            //TODO: add action here
-        }
-
-        requireActivity().findViewById<Button>(R.id.buttonRecyclingCenter)?.setOnClickListener {
+            onToggle(it as Button)
             //TODO: add action here
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
+            onToggle(it as Button)
             bikeRouteToggle = if(!bikeRouteToggle){
                 addBikeRoutes()
                 true
@@ -204,7 +275,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
-
+            onToggle(it as Button)
             if(!bikeTheftsToggle){
                 if(mMap.cameraPosition.zoom < 12){
                     Toast.makeText(
@@ -222,7 +293,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             }
 
         }
+    }
 
+
+    private fun onToggle(button: Button) {
+        button.isSelected = !button.isSelected
+        if (button.isSelected) {
+            button.setTextColor(ContextCompat.getColor(requireContext(), R.color.ocean_green))
+        } else {
+            button.setTextColor(ContextCompat.getColor(requireContext(), R.color.ghost_white))
+        }
     }
 
     private fun favouritesList(){
@@ -427,12 +507,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         val bikeRackList = (activity as CoreActivity).bikeRack
         for (i in bikeRackList) {
             val latLng = LatLng(i.javaClass.getMethod("getLatitude").invoke(i).toString().toDouble(), i.javaClass.getMethod("getLongitude").invoke(i).toString().toDouble())
-            val locationTitle = "${i.javaClass.getMethod("getStreetName").invoke(i)} ${i.javaClass.getMethod("getStreetNumber").invoke(i)}"
-            var locationSnippet = ""
+            val locationTitle = "${i.javaClass.getMethod("getStreetNumber").invoke(i)} ${i.javaClass.getMethod("getStreetName").invoke(i)}"
+            var skytrainStationName = ""
             if(i.javaClass.getMethod("getSkytrainStationName").invoke(i).toString().isNotBlank()){
-                locationSnippet = "${i.javaClass.getMethod("getSkytrainStationName").invoke(i)} Station"
+                skytrainStationName = "${i.javaClass.getMethod("getSkytrainStationName").invoke(i)} Station"
             }
-            bikeRacks.add(BikeRack(latLng, locationTitle, locationSnippet))
+            val numberOfRacks = i.javaClass.getMethod("getNumberOfRacks").invoke(i).toString().toInt()
+            bikeRacks.add(BikeRack(latLng, locationTitle, skytrainStationName, numberOfRacks))
         }
     }
 
@@ -473,11 +554,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         if (!centerMap){
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
             mMap.animateCamera(cameraUpdate)
-
         }
-
-
-
     }
 
     /*
@@ -503,9 +580,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                         this
                     )
                 }
-
-
-
             }
         } catch (e: SecurityException) {
         }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/grey"
+    android:background="@color/light_grey"
     tools:context=".ui.profile.ProfileFragment">
 
     <LinearLayout
@@ -134,7 +134,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/grey"
+                    android:background="@color/light_grey"
                     />
 
                 <TextView
@@ -148,7 +148,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/grey"
+                    android:background="@color/light_grey"
                     />
 
                 <TextView
@@ -162,7 +162,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/grey"
+                    android:background="@color/light_grey"
                     />
 
                 <TextView
