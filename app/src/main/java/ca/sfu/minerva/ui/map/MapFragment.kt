@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.CoreActivity
@@ -113,10 +114,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         poiMarkers = ArrayList()
         buttonList = root.findViewById(R.id.buttonActivateList)
 
-
-
-
-
         return root
     }
 
@@ -202,6 +199,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
+            onToggle(it as Button)
+            val btnBikeTheft = requireActivity().findViewById<Button>(R.id.buttonBikeTheft)
+            // only allow the Bike Theft button to be toggled if the
+            // Bike Racks button is toggled and un-toggle Bike Theft
+            // button if toggled when Bike Racks button is toggled
+            btnBikeTheft.isEnabled = it.isSelected
+            if (!it.isSelected && btnBikeTheft.isSelected) {
+                btnBikeTheft.callOnClick()
+            }
+
             bikeRacksToggle = if(!bikeRacksToggle){
                 addBikeRacks()
                 true
@@ -214,14 +221,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
+            onToggle(it as Button)
             //TODO: add action here
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRepair)?.setOnClickListener {
+            onToggle(it as Button)
             //TODO: add action here
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
+            onToggle(it as Button)
             bikeRouteToggle = if(!bikeRouteToggle){
                 addBikeRoutes()
                 true
@@ -235,7 +245,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
-
+            onToggle(it as Button)
             if(!bikeTheftsToggle){
                 if(mMap.cameraPosition.zoom < 12){
                     Toast.makeText(
@@ -253,7 +263,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             }
 
         }
+    }
 
+
+    private fun onToggle(button: Button) {
+        button.isSelected = !button.isSelected
+        if (button.isSelected) {
+            button.setTextColor(ContextCompat.getColor(requireContext(), R.color.ocean_green))
+        } else {
+            button.setTextColor(ContextCompat.getColor(requireContext(), R.color.ghost_white))
+        }
     }
 
     private fun favouritesList(){
@@ -505,11 +524,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         if (!centerMap){
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
             mMap.animateCamera(cameraUpdate)
-
         }
-
-
-
     }
 
     /*
@@ -535,9 +550,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                         this
                     )
                 }
-
-
-
             }
         } catch (e: SecurityException) {
         }
