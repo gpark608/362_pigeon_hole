@@ -71,6 +71,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var poiMarkers: ArrayList<Marker>
     private lateinit var buttonList: Button
 
+    // current Bike Location
+    private var latLngDB: LatLng = LatLng(0.0,0.0)
+    private lateinit var currentBikeLocationMarkerOption: MarkerOptions
+    private lateinit var currentBikeLocationMarker: Marker
+    private var bikeMarkerPresent = false
+    private lateinit var location: Location
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -89,13 +96,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         databaseDao = database.MinervaDatabaseDao
         repository = MinervaRepository(databaseDao)
         viewModelFactory = MinervaViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MinervaViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory)[MinervaViewModel::class.java]
+        viewModel.BikeLocationDataLive.observe(viewLifecycleOwner, androidx.lifecycle.Observer {})
 
 
         // Favourite POI initializations
         poiDataList = ArrayList()
         poiMarkers = ArrayList()
         buttonList = root.findViewById(R.id.buttonActivateList)
+
+
+
+
 
         return root
     }
@@ -115,10 +127,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mMap.uiSettings.isMyLocationButtonEnabled = true
         mMap.setPadding(0,700,0,0)
 
+        currentBikeLocationMarkerOption = MarkerOptions()
 
         mClusterManager = ClusterManager(activity, mMap)
         mMap.setOnCameraIdleListener(mClusterManager);
+        mMap.setOnCameraMoveListener {
+            val zoomLevel = mMap.cameraPosition.zoom
 
+            if (bikeTheftsToggle && zoomLevel < 12) {
+                mOverlay.remove()
+            }
+        }
         bikeRackList()
         bikeTheftList()
         bikeRouteList()
@@ -185,12 +204,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
-            bikeTheftsToggle = if(!bikeTheftsToggle){
-                addBikeTheft()
-                true
+
+            if(!bikeTheftsToggle){
+                if(mMap.cameraPosition.zoom < 12){
+                    Toast.makeText(
+                        requireActivity(),
+                        "Need to Zoom in More", Toast.LENGTH_SHORT
+                    ).show()
+                }else{
+                    addBikeTheft()
+                    bikeTheftsToggle = true
+                }
+
             }else{
                 mOverlay.remove()
-                false
+                bikeTheftsToggle = false
             }
 
         }
@@ -272,7 +300,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         Log.d("poilist", "${poiDataList.size}")
         for(favourite in poiDataList){
-            poiMarkers.add( mMap.addMarker(poiMarkerOption.title(favourite.name).position(getLatLang(favourite)))!! )
+            poiMarkers.add(mMap.addMarker(poiMarkerOption.title(favourite.name)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .position(getLatLang(favourite)))!! )
 
         }
     }
@@ -419,8 +449,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
     private fun bikeRouteList(){
         bikeRoute = ArrayList()
-
-
         val bikeTrail = (activity as CoreActivity).bikeTrail
         val reg = "(\\[\\D?\\d*.\\d*, \\D?\\d*.\\d*\\])".toRegex()
         for(i in bikeTrail){
@@ -435,33 +463,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             }
             bikeRoute.add(singleBikeRoute)
         }
-
-
-
-
-
-
-
-
-
-
-
     }
 
-    /*
-    Upon location change:
-    1) Center map
-    2) Update location marker
-     */
+
     override fun onLocationChanged(location: Location) {
         val lat = location.latitude
         val lng = location.longitude
         val latLng = LatLng(lat, lng)
-
-        if (!centerMap) {
+        if (!centerMap){
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
             mMap.animateCamera(cameraUpdate)
+
         }
+
+
+
     }
 
     /*
@@ -475,12 +491,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             criteria.accuracy = Criteria.ACCURACY_FINE
             val provider : String? = locationManager.getBestProvider(criteria, true)
             if(provider != null) {
-                val location = locationManager.getLastKnownLocation(provider)
+                location = locationManager.getLastKnownLocation(provider)!!
 
-                if(location != null) {
+                if(location != null){
                     onLocationChanged(location)
-                }else {
-//                    locationManager.requestLocationUpdates(provider, 0, 0f, this)
+                }else{
                     locationManager.requestLocationUpdates(
                         provider,
                         0,
@@ -488,6 +503,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                         this
                     )
                 }
+
+
+
             }
         } catch (e: SecurityException) {
         }
