@@ -3,6 +3,7 @@ package ca.sfu.minerva.ui.map
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.location.*
 import android.os.Bundle
@@ -56,6 +57,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     // Bottom Sheet
     private lateinit var bottomSheetView: ConstraintLayout
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var textViewTitle: TextView
+    private lateinit var textViewAddress: TextView
+    private lateinit var textViewBikeRacks: TextView
+    private var isBikeRackSelected = false
 
     private var bikeRacksToggle: Boolean = false
     private var bikeTheftsToggle: Boolean = false
@@ -94,6 +99,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        textViewTitle = root.findViewById(R.id.text_title)
+        textViewAddress = root.findViewById(R.id.text_address)
+        textViewBikeRacks = root.findViewById(R.id.text_bike_racks)
         bottomSheetView = root.findViewById(R.id.bottomSheet)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
         setBottomSheetVisibility(false)
@@ -125,10 +133,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         val matches = geoCoder.getFromLocation(lat, lng, 1)
         val bestMatch = if (matches.isEmpty()) null else matches[0]
 
-        bottomSheetView.findViewById<TextView>(R.id.text_title).text = "Bike Rack - ${bikeRack.title}"
-        bottomSheetView.findViewById<TextView>(R.id.text_address).text = bestMatch!!.getAddressLine(0).toString()
-        bottomSheetView.findViewById<TextView>(R.id.text_bike_racks).text = bikeRack.getNumberOfRacks().toString()
+        textViewTitle.text = "Bike Rack - ${bikeRack.title}"
+        textViewAddress.text = bestMatch!!.getAddressLine(0).toString()
+        textViewBikeRacks.text = bikeRack.getNumberOfRacks().toString()
 
+        isBikeRackSelected = true
         setBottomSheetVisibility(true)
     }
 
@@ -150,7 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mMap.setOnMapLongClickListener(this)
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.setPadding(0,600,0,600)
+        mMap.setPadding(0,600,0,700)
 
         currentBikeLocationMarkerOption = MarkerOptions()
 
@@ -181,6 +190,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         if(viewModel.favouritesActive)
             addFavouritesToMap()
+
+        requireActivity().findViewById<ImageView>(R.id.image_share).setOnClickListener {
+            if (isBikeRackSelected) {
+                val sharingIntent = Intent(Intent.ACTION_SEND)
+
+                // type of the content to be shared
+                sharingIntent.type = "text/plain"
+
+                // subject of the content. you can share anything
+                val shareSubject = textViewTitle.text.toString()
+                // passing subject of the content
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubject)
+
+                // Body of the content
+                val shareBody = textViewAddress.text.toString()
+                // passing body of the content
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+
+                startActivity(Intent.createChooser(sharingIntent, "Share via"))
+            }
+        }
 
         requireActivity().findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {
             if(!viewModel.favouritesActive){
