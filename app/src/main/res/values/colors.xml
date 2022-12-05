@@ -10,8 +10,9 @@
     <!-- Custom Colors -->
     <color name="red_vermilion">#E62208</color>
     <color name="ocean_green">#1DB162</color>
-    <color name="grey">#ECECEC</color>
+    <color name="light_grey">#ECECEC</color>
     <color name="baby_powder">#FDFFFC</color>
+    <color name="grey">#495057</color>
     <color name="ghost_white">#9D9D9D</color>
     <color name="raisin_black">#1F1F22</color>
 </resources>
