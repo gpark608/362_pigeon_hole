@@ -11,12 +11,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ca.sfu.minerva.CoreActivity
-import ca.sfu.minerva.FavouritePoiActivity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.CoreActivity
 import ca.sfu.minerva.R
 import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.FragmentMapBinding
@@ -25,12 +25,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapLongClickListener {
 
@@ -51,6 +52,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
     private lateinit var mMap: GoogleMap
 
+    // Bottom Sheet
+    private lateinit var bottomSheetView: ConstraintLayout
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private var bikeRacksToggle: Boolean = false
     private var bikeTheftsToggle: Boolean = false
@@ -89,6 +93,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        bottomSheetView = root.findViewById(R.id.bottomSheet)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
+        setBottomSheetVisibility(false)
+
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -112,6 +120,26 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         return root
     }
 
+    private fun onClickMarker(bikeRack: BikeRack) {
+        val lat = bikeRack.position.latitude
+        val lng = bikeRack.position.longitude
+
+        val geoCoder = Geocoder(context)
+        val matches = geoCoder.getFromLocation(lat, lng, 1)
+        val bestMatch = if (matches.isEmpty()) null else matches[0]
+
+        bottomSheetView.findViewById<TextView>(R.id.text_title).text = "Bike Rack - ${bikeRack.title}"
+        bottomSheetView.findViewById<TextView>(R.id.text_address).text = bestMatch!!.getAddressLine(0).toString()
+        bottomSheetView.findViewById<TextView>(R.id.text_bike_racks).text = bikeRack.getNumberOfRacks().toString()
+
+        setBottomSheetVisibility(true)
+    }
+
+    private fun setBottomSheetVisibility(isVisible: Boolean) {
+        val updatedState = if (isVisible) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehavior.state = updatedState
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -125,7 +153,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mMap.setOnMapLongClickListener(this)
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.setPadding(0,700,0,0)
+        mMap.setPadding(0,600,0,600)
 
         currentBikeLocationMarkerOption = MarkerOptions()
 
@@ -144,6 +172,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         initLocationManager()
 
+        mClusterManager.setOnClusterItemClickListener { item ->
+            onClickMarker(item)
+            false
+        }
+        mMap.setOnMapClickListener {
+            setBottomSheetVisibility(false)
+        }
 
         favouritesList()
 
@@ -427,12 +462,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         val bikeRackList = (activity as CoreActivity).bikeRack
         for (i in bikeRackList) {
             val latLng = LatLng(i.javaClass.getMethod("getLatitude").invoke(i).toString().toDouble(), i.javaClass.getMethod("getLongitude").invoke(i).toString().toDouble())
-            val locationTitle = "${i.javaClass.getMethod("getStreetName").invoke(i)} ${i.javaClass.getMethod("getStreetNumber").invoke(i)}"
-            var locationSnippet = ""
+            val locationTitle = "${i.javaClass.getMethod("getStreetNumber").invoke(i)} ${i.javaClass.getMethod("getStreetName").invoke(i)}"
+            var skytrainStationName = ""
             if(i.javaClass.getMethod("getSkytrainStationName").invoke(i).toString().isNotBlank()){
-                locationSnippet = "${i.javaClass.getMethod("getSkytrainStationName").invoke(i)} Station"
+                skytrainStationName = "${i.javaClass.getMethod("getSkytrainStationName").invoke(i)} Station"
             }
-            bikeRacks.add(BikeRack(latLng, locationTitle, locationSnippet))
+            val numberOfRacks = i.javaClass.getMethod("getNumberOfRacks").invoke(i).toString().toInt()
+            bikeRacks.add(BikeRack(latLng, locationTitle, skytrainStationName, numberOfRacks))
         }
     }
 
