@@ -71,6 +71,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var poiMarkers: ArrayList<Marker>
     private lateinit var buttonList: Button
 
+    // Tracking declarations
+    private lateinit var buttonTracking: Button
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -96,6 +99,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         poiDataList = ArrayList()
         poiMarkers = ArrayList()
         buttonList = root.findViewById(R.id.buttonActivateList)
+
+        // Tracking initializations
+        buttonTracking = root.findViewById(R.id.buttonTracking)
 
         return root
     }
@@ -156,6 +162,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 mClusterManager.cluster()
                 false
             }
+
+        }
+
+        buttonTracking.setOnClickListener {
+            // TODO: start and end the tracking service here
+
+            if(!viewModel.bikeTrackingToggle){
+                // Turning on the service
+                buttonTracking.text = "Stop Tracking"
+            }
+            else {
+                // Turning off the service
+                buttonTracking.text = "Start Tracking"
+            }
+
+            viewModel.bikeTrackingToggle = !viewModel.bikeTrackingToggle
 
         }
 

@@ -109,18 +109,26 @@
 
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         map:layout_constraintBottom_toBottomOf="@+id/map"
         tools:ignore="MissingConstraints">
 
         <Button
-        android:id="@+id/buttonActivateList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="View Favourites"
-        android:visibility="invisible" />
+            android:id="@+id/buttonActivateList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Favourites"
+            android:layout_marginRight="10dp"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/buttonTracking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Start Tracking"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,7 +20,7 @@ import ca.sfu.minerva.util.Helper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import io.ktor.network.sockets.*
+//import io.ktor.network.sockets.*
 import kotlin.system.exitProcess
 
 
@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun auth(email: String, pass: String){
+        startCoreActivity()
         if(email.isNotEmpty() && pass.isNotEmpty()){
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this) {
                 if (it.isSuccessful) {
