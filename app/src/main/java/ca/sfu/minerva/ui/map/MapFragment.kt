@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.CoreActivity
 import ca.sfu.minerva.R
+import ca.sfu.minerva.data.BikeShop
 import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.FragmentMapBinding
 import ca.sfu.minerva.util.TrackingService
@@ -32,14 +33,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.android.clustering.ClusterManager
+import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 
@@ -51,10 +51,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var locationManager: LocationManager
     private var centerMap = false
     private lateinit var markerOptions: MarkerOptions
-    private lateinit var mClusterManager: ClusterManager<BikeRack>
+    private lateinit var mClusterManagerBikeRack: ClusterManager<BikeRack>
+    private lateinit var mClusterManagerRecycleCenter: ClusterManager<RecycleCenterCluster>
+    private lateinit var mClusterManagerBikeShop: ClusterManager<BikeShopCluster>
+
+
     private lateinit var bikeRacks: ArrayList<BikeRack>
     private lateinit var bikeThefts: ArrayList<WeightedLatLng>
     private lateinit var bikeRoute: ArrayList<ArrayList<LatLng>>
+    private lateinit var recycleCenter: ArrayList<RecycleCenterCluster>
+    private lateinit var bikeShop: ArrayList<BikeShopCluster>
 
     private lateinit var mProvider: HeatmapTileProvider
     private lateinit var mOverlay: TileOverlay
@@ -73,6 +79,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private var bikeRacksToggle: Boolean = false
     private var bikeTheftsToggle: Boolean = false
     private var bikeRouteToggle: Boolean = false
+    private var recycleCenterToggle: Boolean = false
+    private var bikeShopToggle: Boolean = false
 
     private var polyline_final: ArrayList<Polyline> = arrayListOf()
     private lateinit var database: MinervaDatabase
@@ -167,6 +175,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         setBottomSheetVisibility(true)
     }
 
+
+
     private fun setBottomSheetVisibility(isVisible: Boolean) {
         val updatedState = if (isVisible) BottomSheetBehavior.STATE_EXPANDED else BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetBehavior.state = updatedState
@@ -210,8 +220,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
 
         }
-        mClusterManager = ClusterManager(activity, mMap)
-        mMap.setOnCameraIdleListener(mClusterManager);
+        mClusterManagerBikeRack = ClusterManager(activity, mMap)
+        mClusterManagerRecycleCenter = ClusterManager(activity, mMap)
+        mClusterManagerBikeShop = ClusterManager(activity, mMap)
+
+
+//        mMap.setOnCameraIdleListener(mClusterManagerBikeRack)
+
+        mMap.setOnCameraIdleListener {
+
+            mClusterManagerBikeRack.cluster()
+            mClusterManagerRecycleCenter.cluster()
+            mClusterManagerBikeShop.cluster()
+
+        }
+
         mMap.setOnCameraMoveListener {
             val zoomLevel = mMap.cameraPosition.zoom
 
@@ -222,13 +245,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         bikeRackList()
         bikeTheftList()
         bikeRouteList()
-
+        recycleCenterList()
+        bikeShopList()
         initLocationManager()
 
-        mClusterManager.setOnClusterItemClickListener { item ->
+        mClusterManagerBikeRack.setOnClusterItemClickListener { item ->
             onClickMarker(item)
             false
         }
+
+
         mMap.setOnMapClickListener {
             setBottomSheetVisibility(false)
         }
@@ -258,6 +284,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 startActivity(Intent.createChooser(sharingIntent, "Share via"))
             }
         }
+
         val saveBikeRackTextView =requireActivity().findViewById<TextView>(R.id.saveBikeRack)
         saveBikeRackTextView.setOnClickListener {
             if (isBikeRackSelected) {
@@ -326,8 +353,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 addBikeRacks()
                 true
             }else{
-                mClusterManager.clearItems()
-                mClusterManager.cluster()
+                mClusterManagerBikeRack.clearItems()
+                mClusterManagerBikeRack.cluster()
                 false
             }
 
@@ -348,15 +375,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         }
 
-        requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
+        requireActivity().findViewById<Button>(R.id.buttonRecycleCenter)?.setOnClickListener {
             onToggle(it as Button)
-            //TODO: add action here
+
+
+            recycleCenterToggle = if(!recycleCenterToggle){
+                addRecycleCenter()
+                true
+            }else{
+                mClusterManagerRecycleCenter.clearItems()
+                mClusterManagerRecycleCenter.cluster()
+                false
+            }
+
         }
 
-        requireActivity().findViewById<Button>(R.id.buttonBikeRepair)?.setOnClickListener {
+        requireActivity().findViewById<Button>(R.id.buttonBikeShop)?.setOnClickListener {
             onToggle(it as Button)
-            //TODO: add action here
+            bikeShopToggle = if(!bikeShopToggle){
+                addBikeShop()
+                true
+            }else{
+                mClusterManagerBikeShop.clearItems()
+                mClusterManagerBikeShop.cluster()
+                false
+            }
         }
+
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRoutes)?.setOnClickListener {
             onToggle(it as Button)
@@ -615,11 +660,23 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
     private fun addBikeRacks() {
         activity?.runOnUiThread{
-            mClusterManager.addItems(bikeRacks)
-            mClusterManager.cluster()
+            mClusterManagerBikeRack.addItems(bikeRacks)
+            mClusterManagerBikeRack.cluster()
         }
     }
 
+    private fun addRecycleCenter() {
+        activity?.runOnUiThread{
+            mClusterManagerRecycleCenter.addItems(recycleCenter)
+            mClusterManagerRecycleCenter.cluster()
+        }
+    }
+    private fun addBikeShop() {
+        activity?.runOnUiThread{
+            mClusterManagerBikeShop.addItems(bikeShop)
+            mClusterManagerBikeShop.cluster()
+        }
+    }
     private fun addBikeTheft() {
         activity?.runOnUiThread{
             val colors = intArrayOf(
@@ -659,6 +716,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
     }
 
+
+
     private fun bikeRackList(){
         bikeRacks = ArrayList()
         val bikeRackList = (activity as CoreActivity).bikeRack
@@ -674,6 +733,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
     }
 
+    private fun recycleCenterList(){
+        recycleCenter = ArrayList()
+        val bikeRackList = (activity as CoreActivity).recycleCenter
+        for (i in bikeRackList) {
+            val latLng = LatLng(i.javaClass.getMethod("getLatitude").invoke(i).toString().toDouble(), i.javaClass.getMethod("getLongitude").invoke(i).toString().toDouble())
+            val locationTitle = "${i.javaClass.getMethod("getName").invoke(i)}"
+            val phoneNumber = "${i.javaClass.getMethod("getPhone").invoke(i)}"
+            recycleCenter.add(RecycleCenterCluster(latLng, locationTitle, phoneNumber))
+
+
+
+        }
+    }
+
+    private fun bikeShopList(){
+        bikeShop = ArrayList()
+        val bikeRackList = (activity as CoreActivity).bikeShop
+        for (i in bikeRackList) {
+            val latLng = LatLng(i.javaClass.getMethod("getLatitude").invoke(i).toString().toDouble(), i.javaClass.getMethod("getLongitude").invoke(i).toString().toDouble())
+            val locationTitle = "${i.javaClass.getMethod("getName").invoke(i)}"
+            val phoneNumber = "${i.javaClass.getMethod("getPhone").invoke(i)}"
+            bikeShop.add(BikeShopCluster(latLng, locationTitle, phoneNumber))
+
+
+
+        }
+    }
     private fun bikeTheftList(){
         bikeThefts = ArrayList()
         val bikeTheftList = (activity as CoreActivity).bikeTheft

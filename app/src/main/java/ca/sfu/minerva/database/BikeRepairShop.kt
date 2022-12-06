@@ -12,9 +12,6 @@ data class BikeRepairShop (
     @ColumnInfo(name = "address_column")
     var address:String = "",
 
-//    @ColumnInfo(name = "latlng_column")
-//    var latLng:LatLng = LatLng(0,0),
-
     @ColumnInfo(name = "business_name_column")
     var businessName:String = ""
 )

@@ -4,9 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import ca.sfu.minerva.data.BikeTrail
-import ca.sfu.minerva.data.BikeRack
-import ca.sfu.minerva.data.BikeTheft
+import ca.sfu.minerva.data.*
 import ca.sfu.minerva.databinding.ActivityCoreBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +18,8 @@ class CoreActivity : AppCompatActivity() {
     var bikeTrail: List<Any> = arrayListOf()
     var bikeTheft: List<Any> = arrayListOf()
     var bikeRack: List<Any> = arrayListOf()
+    var recycleCenter: List<Any> = arrayListOf()
+    var bikeShop: List<Any> = arrayListOf()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,14 +35,22 @@ class CoreActivity : AppCompatActivity() {
 
 
         CoroutineScope(Dispatchers.IO).launch {
-            bikeTrail = readCsv(resources.openRawResource(R.raw.bike_trail))
+            bikeTrail = readCsv("bikeTrail", resources.openRawResource(R.raw.bike_trail))
         }.invokeOnCompletion {}
         CoroutineScope(Dispatchers.IO).launch {
-            bikeTheft = readCsv(resources.openRawResource(R.raw.bike_theft))
+            bikeTheft = readCsv("bikeTheft", resources.openRawResource(R.raw.bike_theft))
         }.invokeOnCompletion {}
 
         CoroutineScope(Dispatchers.IO).launch {
-            bikeRack = readCsv(resources.openRawResource(R.raw.bike_rack))
+            bikeRack = readCsv("bikeRack", resources.openRawResource(R.raw.bike_rack))
+        }.invokeOnCompletion{}
+
+        CoroutineScope(Dispatchers.IO).launch {
+            recycleCenter = readCsv("recycleCenter", resources.openRawResource(R.raw.recycle_center))
+        }.invokeOnCompletion{}
+
+        CoroutineScope(Dispatchers.IO).launch {
+            bikeShop = readCsv("bikeShop", resources.openRawResource(R.raw.bike_shops))
         }.invokeOnCompletion{}
 
 
@@ -53,17 +61,19 @@ class CoreActivity : AppCompatActivity() {
 
 
     }
-    private fun readCsv(inputStream: InputStream): List<Any> {
+    private fun readCsv(csvType:String, inputStream: InputStream): List<Any> {
         val reader = inputStream.bufferedReader()
         val header = reader.readLine()
         return reader.lineSequence()
             .filter { it.isNotBlank() }
             .map {
                 val columns = it.split(',', ignoreCase = false)
-                when(columns.size){
+                when(csvType){
 
-                    6 -> BikeTheft(columns[0].toInt(), columns[1].toInt(), columns[2], columns[3].toDouble(), columns[4].toDouble(), columns[5])
-                    8 -> BikeRack(columns[0].toInt(), columns[1].toDouble(), columns[2].toDouble(), columns[3].toInt(), columns[4], columns[5], columns[6], columns[7])
+                    "bikeTheft" -> BikeTheft(columns[0].toInt(), columns[1].toInt(), columns[2], columns[3].toDouble(), columns[4].toDouble(), columns[5])
+                    "bikeRack" -> BikeRack(columns[0].toInt(), columns[1].toDouble(), columns[2].toDouble(), columns[3].toInt(), columns[4], columns[5], columns[6], columns[7])
+                    "recycleCenter"->RecycleCenter(columns[0].toInt(), columns[1].toDouble(), columns[2].toDouble(), columns[3], columns[4])
+                    "bikeShop"->BikeShop(columns[0].toInt(), columns[1].toDouble(), columns[2].toDouble(), columns[3], columns[4])
                     else -> BikeTrail(columns[0].toInt(), columns[1], columns.subList(2, columns.size).joinToString() )
 
                 }
