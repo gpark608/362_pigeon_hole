@@ -20,7 +20,7 @@ import ca.sfu.minerva.util.Helper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import io.ktor.network.sockets.*
+//import io.ktor.network.sockets.*
 import kotlin.system.exitProcess
 
 

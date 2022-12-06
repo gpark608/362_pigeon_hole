@@ -17,7 +17,14 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
     val RecyclingCentreDataLive: LiveData<List<RecyclingCenter>> = repository.RecyclingCenterData.asLiveData()
     val BikeLocationDataLive: LiveData<List<BikeLocation>> = repository.BikeLocationData.asLiveData()
     val FavouriteLocationDataLive: LiveData<List<FavouriteLocation>> = repository.FavouriteLocationData.asLiveData()
+    val allBikeUsageLiveData: LiveData<List<BikeUsage>> = repository.BikeUsageData.asLiveData()
     var favouritesActive: Boolean = false
+    var bikeTrackingToggle: Boolean = false
+
+
+    fun insertBikeUsage(data: BikeUsage){
+        repository.insertBikeUsage(data)
+    }
 
     fun insertBikeRentalPlace(data: BikeRentalPlace){
         repository.insertBikeRentalPlace(data)

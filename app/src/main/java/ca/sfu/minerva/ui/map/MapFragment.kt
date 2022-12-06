@@ -23,6 +23,8 @@ import ca.sfu.minerva.CoreActivity
 import ca.sfu.minerva.R
 import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.FragmentMapBinding
+import ca.sfu.minerva.util.TrackingService
+import ca.sfu.minerva.util.TrackingViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -33,7 +35,11 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
-import io.ktor.utils.io.concurrent.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 
@@ -90,6 +96,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private var clickedMarkerLocation = LatLng(0.0, 0.0)
     private lateinit var location: Location
 
+    // Tracking declarations
+    private lateinit var buttonTracking: Button
+    private lateinit var trackingServiceIntent: Intent
+    private lateinit var trackingViewModel: TrackingViewModel
+    private lateinit var latestTrackingBundle: Bundle
+
+
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
 
@@ -128,6 +141,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         poiDataList = ArrayList()
         poiMarkers = ArrayList()
         buttonList = root.findViewById(R.id.buttonActivateList)
+
+        // Tracking initializations
+        buttonTracking = root.findViewById(R.id.buttonTracking)
+        trackingViewModel = ViewModelProvider(this)[TrackingViewModel::class.java]
+        trackingServiceIntent = Intent(requireActivity(), TrackingService::class.java)
 
         return root
     }
@@ -315,6 +333,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         }
 
+        buttonTracking.setOnClickListener {
+            if(!viewModel.bikeTrackingToggle){
+                startTrackingService()
+                buttonTracking.text = "Stop Tracking"
+            }
+            else {
+                // Turning off the service
+                stopTrackingService()
+                buttonTracking.text = "Start Tracking"
+            }
+
+            viewModel.bikeTrackingToggle = !viewModel.bikeTrackingToggle
+
+        }
+
         requireActivity().findViewById<Button>(R.id.buttonBikeRental)?.setOnClickListener {
             onToggle(it as Button)
             //TODO: add action here
@@ -368,6 +401,65 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         } else {
             button.setTextColor(ContextCompat.getColor(requireContext(), R.color.ghost_white))
         }
+    }
+
+    private fun startTrackingService(){
+        ContextCompat.startForegroundService(requireActivity(), trackingServiceIntent)
+//        requireActivity().application.startForegroundService(trackingServiceIntent)
+        requireActivity().applicationContext.bindService(trackingServiceIntent, trackingViewModel, Context.BIND_AUTO_CREATE)
+
+        trackingViewModel.mapBundle.observe(viewLifecycleOwner){
+            latestTrackingBundle = it
+
+            drawCurrentBikeUsage()
+        }
+
+    }
+
+    private fun stopTrackingService(){
+        requireActivity().applicationContext.unbindService(trackingViewModel)
+        requireActivity().applicationContext.stopService(trackingServiceIntent)
+
+        CoroutineScope(IO).launch {
+            // save the current usage into db
+            var bikeUsage = BikeUsage()
+            bikeUsage.climb = latestTrackingBundle.getFloat("currentAltitude").toDouble()
+            bikeUsage.date = latestTrackingBundle.getFloat("date").toString()
+            bikeUsage.duration = latestTrackingBundle.getDouble("elapsedTime").toString()
+            bikeUsage.distance = latestTrackingBundle.getDouble("elapsedDistance")
+            bikeUsage.avgSpeed = latestTrackingBundle.getDouble("avgSpeed")
+            bikeUsage.time = latestTrackingBundle.getDouble("startTime").toString()
+
+            var tempArr = ArrayList<LatLng>()
+
+            if(latestTrackingBundle.getParcelableArrayList<Location>("locations") != null) {
+                for (element in latestTrackingBundle.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
+                    tempArr.add(LatLng(element.latitude, element.longitude))
+                }
+            }
+            else{
+                tempArr.add(LatLng(0.0, 0.0))
+            }
+            bikeUsage.locationList = tempArr
+
+            viewModel.insertBikeUsage(bikeUsage)
+        }
+
+        Toast.makeText(
+            requireActivity(),
+            "Saved biking event",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        removeCurrentBikeUsage()
+    }
+
+    private fun drawCurrentBikeUsage(){
+        // TODO: drawing on map the current service reading
+    }
+
+    private fun removeCurrentBikeUsage(){
+        latestTrackingBundle.clear()
     }
 
     private fun favouritesList(){

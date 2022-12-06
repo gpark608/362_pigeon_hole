@@ -29,6 +29,9 @@ interface MinervaDatabaseDao {
     @Insert
     suspend fun insertFavouriteLocation(favLocation: FavouriteLocation)
 
+    @Insert
+    suspend fun insertBikeUsage(bikeUsage: BikeUsage)
+
 //    --------
 
     @Query("SELECT * FROM bike_rental_place_table")
@@ -52,6 +55,9 @@ interface MinervaDatabaseDao {
     @Query("SELECT * FROM favourite_table")
     fun getAllFavouriteLocation(): Flow<List<FavouriteLocation>>
 
+    @Query("SELECT * FROM bike_usage_table")
+    fun getAllBikeUsages() : Flow<List<BikeUsage>>
+
 //    -----
     @Query("SELECT * FROM bike_rental_place_table WHERE id = :key")
     suspend fun getBikeRentalFromKey(key: Long) : BikeRentalPlace
@@ -70,6 +76,9 @@ interface MinervaDatabaseDao {
 
     @Query("SELECT * FROM bike_location_table WHERE id = :key")
     suspend fun getBikeLocationFromKey(key: Long) : BikeLocation
+
+    @Query("SELECT * FROM bike_usage_table WHERE id = :key")
+    suspend fun getBikeUsageFromKey(key: Long) : BikeUsage
 
 //  -----
     @Query("DELETE FROM favourite_table WHERE name = :key")

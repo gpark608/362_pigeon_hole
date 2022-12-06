@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class MapViewModel: ViewModel(), ServiceConnection {
+class TrackingViewModel: ViewModel(), ServiceConnection {
     private var mapDataHandler: MapDataHandler = MapDataHandler(Looper.getMainLooper())
     private val _mapBundle = MutableLiveData<Bundle>()
 
@@ -19,8 +19,8 @@ class MapViewModel: ViewModel(), ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
         Log.d("DEBUG: ", "Service Connected")
-        val trackingServiceBinder = iBinder as TrackingService.TrackingServiceBinder
-        trackingServiceBinder.setMapDataHandler(mapDataHandler)
+        val trackingServiceBinder = iBinder as TrackingService.MyBinder
+        trackingServiceBinder.setMsgHandler(mapDataHandler)
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
@@ -29,7 +29,7 @@ class MapViewModel: ViewModel(), ServiceConnection {
 
     inner class MapDataHandler(looper: Looper): Handler(looper) {
         override fun handleMessage(msg: Message) {
-            if (msg.what == TrackingService.TRACKING_MESSAGE_ID) {
+            if (msg.what == TrackingService.LOCATION_MSG_INT) {
                 _mapBundle.value = msg.data
             }
         }
