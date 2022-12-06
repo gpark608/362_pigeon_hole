@@ -1,118 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".ui.map.MapFragment"
     android:orientation="vertical">
 
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintHorizontal_bias="0.0"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toTopOf="parent"
-        map:layout_constraintVertical_bias="1.0"
-        tools:context=".ui.map.MapFragment" />
+        app:layout_anchor="@id/bottomSheet" />
 
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="true"
-        map:layout_constraintBottom_toTopOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintHorizontal_bias="0.0"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toTopOf="parent"
-        map:layout_constraintVertical_bias="0.865"
-        android:paddingTop="70dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/buttonBikeRacks"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bike Racks"
-                android:layout_margin="5dp" />
-
-            <Button
-                android:id="@+id/buttonBikeRental"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bike Rentals"
-                android:layout_margin="5dp"/>
-
-            <Button
-                android:id="@+id/buttonBikeRepair"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bike Repair Shops"
-                android:layout_margin="5dp"/>
-
-            <Button
-                android:id="@+id/buttonEcoStore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Eco-Stores"
-                android:layout_margin="5dp"/>
-
-            <Button
-                android:id="@+id/buttonRecyclingCenter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Recycling Centers"
-                android:layout_margin="5dp"/>
-
-            <Button
-                android:id="@+id/buttonFavourites"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Favourites"
-                android:layout_margin="5dp"/>
-
-            <Button
-                android:id="@+id/buttonBikeRoutes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bike Routes"
-                android:layout_margin="5dp"/>
-
-            <Button
-                android:id="@+id/buttonBikeTheft"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bike Theft"
-                android:layout_margin="5dp"/>
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
-
+    <include layout="@layout/bottom_sheet" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        map:layout_constraintBottom_toBottomOf="@+id/map"
         tools:ignore="MissingConstraints">
 
         <Button
@@ -131,4 +41,4 @@
             android:text="Start Tracking"/>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

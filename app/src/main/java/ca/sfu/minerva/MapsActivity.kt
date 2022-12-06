@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import ca.sfu.minerva.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener,  GoogleMap.OnMapLongClickListener {
@@ -112,6 +113,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
 
             mMap.animateCamera(cameraUpdate)
             bikeMarker = mMap.addMarker(bikeMarkerOptions)!!
+
+
 
             bikeMarkerPresent=true
         }else{
