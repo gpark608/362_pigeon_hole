@@ -3,6 +3,7 @@ package ca.sfu.minerva.ui.map
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.location.*
 import android.os.Bundle
@@ -270,8 +271,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
 
         buttonTracking.setOnClickListener {
-            // TODO: start and end the tracking service here
-
             if(!viewModel.bikeTrackingToggle){
                 startTrackingService()
                 buttonTracking.text = "Stop Tracking"
@@ -623,11 +622,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         val bikeTrail = (activity as CoreActivity).bikeTrail
         val reg = "(\\[\\D?\\d*.\\d*, \\D?\\d*.\\d*\\])".toRegex()
-        for(i in bikeTrail){
+        for(i in bikeTrail) {
             val matches = reg.findAll(i.javaClass.getMethod("getGeom").invoke(i).toString())
-            val latLngs = matches.map{it.value}.toList()
-            val singleBikeRoute:ArrayList<LatLng> = ArrayList()
-            for(j in latLngs){
+            val latLngs = matches.map { it.value }.toList()
+            val singleBikeRoute: ArrayList<LatLng> = ArrayList()
+            for (j in latLngs) {
 //                println("debug: j is ${j}")
                 val (long, lat) = j.drop(1).dropLast(1).split(", ")
 
@@ -635,17 +634,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             }
             bikeRoute.add(singleBikeRoute)
         }
-
-
-
-
-
-
-
-
-
-
-
     }
 
     /*
