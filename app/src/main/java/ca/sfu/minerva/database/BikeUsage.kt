@@ -32,4 +32,4 @@ data class BikeUsage (
 
     @ColumnInfo(name = "location_list_column")
     var locationList: ArrayList<LatLng> = ArrayList()
-)
+): java.io.Serializable

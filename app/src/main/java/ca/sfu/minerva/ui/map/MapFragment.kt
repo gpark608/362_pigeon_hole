@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import ca.sfu.minerva.CoreActivity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.R
@@ -31,6 +32,9 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -230,7 +234,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     }
 
     private fun startTrackingService(){
-        requireActivity().application.startForegroundService(trackingServiceIntent)
+        ContextCompat.startForegroundService(requireActivity(), trackingServiceIntent)
+//        requireActivity().application.startForegroundService(trackingServiceIntent)
         requireActivity().applicationContext.bindService(trackingServiceIntent, trackingViewModel, Context.BIND_AUTO_CREATE)
 
         trackingViewModel.mapBundle.observe(viewLifecycleOwner){
@@ -242,18 +247,33 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     }
 
     private fun stopTrackingService(){
-        requireActivity().applicationContext.unbindService(trackingServiceIntent)
+        requireActivity().applicationContext.unbindService(trackingViewModel)
         requireActivity().applicationContext.stopService(trackingServiceIntent)
 
-        // save the current usage into db
-        var bikeUsage = BikeUsage()
-        bikeUsage.climb = latestTrackingBundle.getFloat("SPEED").toDouble()
-        bikeUsage.date = LocalDate.now().toString()
-        bikeUsage.duration = latestTrackingBundle.getDouble("TOTAL_TIME").toString()
-        bikeUsage.avgSpeed = bikeUsage.duration.toDouble() / bikeUsage.duration.toDouble() + Float.MIN_VALUE
-        bikeUsage.time = LocalDateTime.now().minusSeconds((bikeUsage.duration.toDouble()*1000).toLong()).toString()
+        CoroutineScope(IO).launch {
+            // save the current usage into db
+            var bikeUsage = BikeUsage()
+            bikeUsage.climb = latestTrackingBundle.getFloat("currentAltitude").toDouble()
+            bikeUsage.date = latestTrackingBundle.getFloat("date").toString()
+            bikeUsage.duration = latestTrackingBundle.getDouble("elapsedTime").toString()
+            bikeUsage.distance = latestTrackingBundle.getDouble("elapsedDistance")
+            bikeUsage.avgSpeed = latestTrackingBundle.getDouble("avgSpeed")
+            bikeUsage.time = latestTrackingBundle.getDouble("startTime").toString()
 
-        viewModel.insertBikeUsage(bikeUsage)
+            var tempArr = ArrayList<LatLng>()
+
+            if(latestTrackingBundle.getParcelableArrayList<Location>("locations") != null) {
+                for (element in latestTrackingBundle.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
+                    tempArr.add(LatLng(element.latitude, element.longitude))
+                }
+            }
+            else{
+                tempArr.add(LatLng(0.0, 0.0))
+            }
+            bikeUsage.locationList = tempArr
+
+            viewModel.insertBikeUsage(bikeUsage)
+        }
 
         removeCurrentBikeUsage()
     }

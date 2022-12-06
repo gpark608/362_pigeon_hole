@@ -120,21 +120,21 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback  {
     }
 
     private fun updateMap(bundle: Bundle) {
-        speed = bundle.getFloat(TrackingService.SPEED)
-        distance = bundle.getFloat(TrackingService.DISTANCE)
-        altitude = bundle.getDouble(TrackingService.ALTITUDE)
-        locations = Helper.jsonToLatLng(bundle.getString(TrackingService.LOCATIONS)!!)
-        latestLocation = locations.last()
-
-        println("~~~~~~ MAP DATA ~~~~~~")
-        println("Speed: $speed")
-        println("Distance: $distance")
-        println("Altitude: $altitude")
-        println("Location: $latestLocation")
-
-        // continuously update the view to center the user
-        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latestLocation, 15f)
-        mMap.animateCamera(cameraUpdate, 400, null)
+//        speed = bundle.getFloat(TrackingService.SPEED)
+//        distance = bundle.getFloat(TrackingService.DISTANCE)
+//        altitude = bundle.getDouble(TrackingService.ALTITUDE)
+//        locations = Helper.jsonToLatLng(bundle.getString(TrackingService.LOCATIONS)!!)
+//        latestLocation = locations.last()
+//
+//        println("~~~~~~ MAP DATA ~~~~~~")
+//        println("Speed: $speed")
+//        println("Distance: $distance")
+//        println("Altitude: $altitude")
+//        println("Location: $latestLocation")
+//
+//        // continuously update the view to center the user
+//        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latestLocation, 15f)
+//        mMap.animateCamera(cameraUpdate, 400, null)
     }
 
     @SuppressLint("MissingPermission")
