@@ -152,10 +152,10 @@ class TrackingService: Service(), LocationListener {
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
             intent.putExtra("activityFromActiveService", true)
 
-            val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(temp).run {
-                addNextIntentWithParentStack(intent)
-                getPendingIntent(REQUEST_CODE, PendingIntent.FLAG_UPDATE_CURRENT and PendingIntent.FLAG_IMMUTABLE)
-            }
+//            val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(temp).run {
+//                addNextIntentWithParentStack(intent)
+//                getPendingIntent(REQUEST_CODE, PendingIntent.FLAG_UPDATE_CURRENT and PendingIntent.FLAG_IMMUTABLE)
+//            }
 
             val notificationBuilder : NotificationCompat.Builder = NotificationCompat.Builder(
                 temp, CHANNEL_ID
@@ -163,7 +163,7 @@ class TrackingService: Service(), LocationListener {
             notificationBuilder.setContentTitle("Minerva")
             notificationBuilder.setContentText("Tracking current bike ride")
             notificationBuilder.setSmallIcon(R.drawable.splash_screen)
-            notificationBuilder.setContentIntent(resultPendingIntent)
+//            notificationBuilder.setContentIntent(resultPendingIntent)
             notificationBuilder.setOngoing(true)
             val notification = notificationBuilder.build()
 
