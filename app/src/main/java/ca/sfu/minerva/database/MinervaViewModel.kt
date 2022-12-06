@@ -2,14 +2,9 @@ package ca.sfu.minerva.database
 
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
@@ -71,6 +66,10 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
 
     fun getBikeUsageTopSpeed(): Double {
         return repository.getBikeUsageTopSpeed()
+    }
+
+    fun getBikingUsageEventsCount(): Int{
+        return repository.getAllBiking()
     }
 
 
