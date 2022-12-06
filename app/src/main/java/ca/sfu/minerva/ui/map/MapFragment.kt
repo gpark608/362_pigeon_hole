@@ -108,7 +108,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var buttonTracking: Button
     private lateinit var trackingServiceIntent: Intent
     private lateinit var trackingViewModel: TrackingViewModel
-    private lateinit var latestTrackingBundle: Bundle
+    private var latestTrackingBundle: Bundle? = null
 
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -154,6 +154,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         buttonTracking = root.findViewById(R.id.buttonTracking)
         trackingViewModel = ViewModelProvider(this)[TrackingViewModel::class.java]
         trackingServiceIntent = Intent(requireActivity(), TrackingService::class.java)
+        if(viewModel.bikeTrackingToggle)
+            buttonTracking.text = "Stop Tracking"
+
 
         return root
     }
@@ -361,14 +364,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         }
 
+
+        if(viewModel.bikeTrackingToggle)
+            buttonTracking.text = "Stop Tracking"
+
         buttonTracking.setOnClickListener {
             if(!viewModel.bikeTrackingToggle){
                 startTrackingService()
+                Log.d("tracking", "Tracking status: started")
                 buttonTracking.text = "Stop Tracking"
             }
             else {
                 // Turning off the service
                 stopTrackingService()
+                Log.d("tracking", "Tracking status: stopped")
                 buttonTracking.text = "Start Tracking"
             }
 
@@ -450,14 +459,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     }
 
     private fun startTrackingService(){
-        ContextCompat.startForegroundService(requireActivity(), trackingServiceIntent)
-//        requireActivity().application.startForegroundService(trackingServiceIntent)
+        requireActivity().startService(trackingServiceIntent)
+//        requireActivity().applicationContext.startForegroundService(trackingServiceIntent)
+        //ContextCompat.startForegroundService(requireActivity().applicationContext, trackingServiceIntent)
         requireActivity().applicationContext.bindService(trackingServiceIntent, trackingViewModel, Context.BIND_AUTO_CREATE)
 
         trackingViewModel.mapBundle.observe(viewLifecycleOwner){
             latestTrackingBundle = it
-
-            drawCurrentBikeUsage()
+            Log.d("bike usage detail", "new bundle received")
         }
 
     }
@@ -466,46 +475,41 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         requireActivity().applicationContext.unbindService(trackingViewModel)
         requireActivity().applicationContext.stopService(trackingServiceIntent)
 
-        CoroutineScope(IO).launch {
-            // save the current usage into db
-            var bikeUsage = BikeUsage()
-            bikeUsage.climb = latestTrackingBundle.getFloat("currentAltitude").toDouble()
-            bikeUsage.date = latestTrackingBundle.getFloat("date").toString()
-            bikeUsage.duration = latestTrackingBundle.getDouble("elapsedTime").toString()
-            bikeUsage.distance = latestTrackingBundle.getDouble("elapsedDistance")
-            bikeUsage.avgSpeed = latestTrackingBundle.getDouble("avgSpeed")
-            bikeUsage.time = latestTrackingBundle.getDouble("startTime").toString()
 
-            var tempArr = ArrayList<LatLng>()
 
-            if(latestTrackingBundle.getParcelableArrayList<Location>("locations") != null) {
-                for (element in latestTrackingBundle.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
-                    tempArr.add(LatLng(element.latitude, element.longitude))
+        if(latestTrackingBundle != null && !latestTrackingBundle!!.isEmpty()) {
+            CoroutineScope(IO).launch {
+                // save the current usage into db
+                var bikeUsage = BikeUsage()
+                bikeUsage.climb = latestTrackingBundle!!.getDouble("currentAltitude")
+                bikeUsage.date = latestTrackingBundle!!.getString("date").toString()
+                bikeUsage.duration = latestTrackingBundle!!.getFloat("elapsedTime").toString()
+                bikeUsage.distance = latestTrackingBundle!!.getFloat("elapsedDistance").toDouble()
+                bikeUsage.avgSpeed = latestTrackingBundle!!.getFloat("avgSpeed").toDouble()
+                bikeUsage.time = latestTrackingBundle!!.getString("startTime").toString()
+                bikeUsage.speed = latestTrackingBundle!!.getFloat("speed").toDouble()
+
+                var tempArr = ArrayList<LatLng>()
+
+                if (latestTrackingBundle!!.getParcelableArrayList<Location>("locations") != null) {
+                    for (element in latestTrackingBundle!!.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
+                        tempArr.add(LatLng(element.latitude, element.longitude))
+                    }
+                } else {
+                    tempArr.add(LatLng(0.0, 0.0))
                 }
-            }
-            else{
-                tempArr.add(LatLng(0.0, 0.0))
-            }
-            bikeUsage.locationList = tempArr
+                bikeUsage.locationList = tempArr
 
-            viewModel.insertBikeUsage(bikeUsage)
+                viewModel.insertBikeUsage(bikeUsage)
+                latestTrackingBundle!!.clear()
+            }
+
+            Toast.makeText(
+                requireActivity(),
+                "Saved biking event",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-
-        Toast.makeText(
-            requireActivity(),
-            "Saved biking event",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        removeCurrentBikeUsage()
-    }
-
-    private fun drawCurrentBikeUsage(){
-        // TODO: drawing on map the current service reading
-    }
-
-    private fun removeCurrentBikeUsage(){
-        latestTrackingBundle.clear()
     }
 
     private fun favouritesList(){
@@ -581,7 +585,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         buttonList.visibility = View.VISIBLE
 
-        Log.d("poilist", "${poiDataList.size}")
         for(favourite in poiDataList){
             poiMarkers.add(mMap.addMarker(poiMarkerOption.title(favourite.name)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))

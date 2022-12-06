@@ -30,6 +30,9 @@ data class BikeUsage (
     @ColumnInfo(name = "date_column")
     var date:String = "",
 
+    @ColumnInfo(name = "speed_column")
+    var speed:Double = 0.0,
+
     @ColumnInfo(name = "location_list_column")
     var locationList: ArrayList<LatLng> = ArrayList()
 ): java.io.Serializable
