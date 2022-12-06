@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -43,7 +44,11 @@
                 android:value="" />
         </activity>
 
-        <service android:name="ca.sfu.minerva.util.TrackingService" />
+        <service
+            android:name="ca.sfu.minerva.util.TrackingService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="location"/>
 
         <activity
             android:name=".CoreActivity"
