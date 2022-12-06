@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.location.*
 import android.os.Bundle
@@ -12,14 +13,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ca.sfu.minerva.CoreActivity
-import ca.sfu.minerva.FavouritePoiActivity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.CoreActivity
 import ca.sfu.minerva.R
 import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.FragmentMapBinding
@@ -35,6 +35,7 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
+import io.ktor.utils.io.concurrent.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -90,10 +91,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var buttonList: Button
 
     // current Bike Location
-    private var latLngDB: LatLng = LatLng(0.0,0.0)
     private lateinit var currentBikeLocationMarkerOption: MarkerOptions
     private lateinit var currentBikeLocationMarker: Marker
-    private var bikeMarkerPresent = false
+    private var currentbikeMarkerPresent = false
+    private var clickedMarkerLocation = LatLng(0.0, 0.0)
     private lateinit var location: Location
 
     // Tracking declarations
@@ -102,6 +103,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var trackingViewModel: TrackingViewModel
     private lateinit var latestTrackingBundle: Bundle
 
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -129,7 +133,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         repository = MinervaRepository(databaseDao)
         viewModelFactory = MinervaViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory)[MinervaViewModel::class.java]
-        viewModel.BikeLocationDataLive.observe(viewLifecycleOwner, androidx.lifecycle.Observer {})
+
+
+
 
 
         // Favourite POI initializations
@@ -148,6 +154,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private fun onClickMarker(bikeRack: BikeRack) {
         val lat = bikeRack.position.latitude
         val lng = bikeRack.position.longitude
+        clickedMarkerLocation = LatLng(lat, lng)
 
         val geoCoder = Geocoder(context)
         val matches = geoCoder.getFromLocation(lat, lng, 1)
@@ -182,7 +189,28 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mMap.setPadding(0,600,0,800)
 
         currentBikeLocationMarkerOption = MarkerOptions()
+        currentBikeLocationMarkerOption.title("Current Bike Location")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
 
+        sharedPreferences = requireActivity().getSharedPreferences("bikeLocation", AppCompatActivity.MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+        val currentMarkerSharedPreference =sharedPreferences.getStringSet("latlng", setOf())
+        println("debug: currentMarkerSharedPreference ${currentMarkerSharedPreference}")
+        if(!currentMarkerSharedPreference.isNullOrEmpty()){
+            val lat = currentMarkerSharedPreference.elementAt(0).toDouble()
+            val lng = currentMarkerSharedPreference.elementAt(1).toDouble()
+            clickedMarkerLocation = LatLng(lat, lng)
+
+            currentBikeLocationMarkerOption.position(clickedMarkerLocation)
+            currentBikeLocationMarker = mMap.addMarker(currentBikeLocationMarkerOption)!!
+            currentBikeLocationMarker.zIndex = Float.MAX_VALUE
+            currentBikeLocationMarker.showInfoWindow()
+            requireActivity().findViewById<TextView>(R.id.saveBikeRack).text = "Remove Current Location"
+            requireActivity().findViewById<TextView>(R.id.saveBikeRack).setTextColor(Color.RED)
+            currentbikeMarkerPresent = true
+
+
+        }
         mClusterManager = ClusterManager(activity, mMap)
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnCameraMoveListener {
@@ -230,6 +258,42 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
                 startActivity(Intent.createChooser(sharingIntent, "Share via"))
             }
+        }
+        val saveBikeRackTextView =requireActivity().findViewById<TextView>(R.id.saveBikeRack)
+        saveBikeRackTextView.setOnClickListener {
+            if (isBikeRackSelected) {
+                if(!currentbikeMarkerPresent){
+                    val latlngSet = mutableSetOf<String>()
+                    latlngSet.add(clickedMarkerLocation.latitude.toString())
+                    latlngSet.add(clickedMarkerLocation.longitude.toString())
+                    editor.putStringSet("latlng", latlngSet)
+                    editor.apply()
+
+                    currentBikeLocationMarkerOption.position(clickedMarkerLocation)
+                    currentBikeLocationMarker = mMap.addMarker(currentBikeLocationMarkerOption)!!
+                    currentBikeLocationMarker.zIndex = Float.MAX_VALUE
+                    currentBikeLocationMarker.showInfoWindow()
+                    saveBikeRackTextView.text = "Remove Current Location"
+                    saveBikeRackTextView.setTextColor(Color.RED)
+
+                    currentbikeMarkerPresent = true
+
+                }else{
+                    editor.putStringSet("latlng", setOf())
+                    saveBikeRackTextView.text = "Save BikeRack as \nCurrent Location"
+                    saveBikeRackTextView.setTextColor(resources.getColor(R.color.green,null))
+                    currentBikeLocationMarker.remove()
+                    currentbikeMarkerPresent = false
+                }
+            }else if(!isBikeRackSelected && currentbikeMarkerPresent){
+                editor.putStringSet("latlng", setOf())
+                saveBikeRackTextView.text = "Save BikeRack as \nCurrent Location"
+                saveBikeRackTextView.setTextColor(resources.getColor(R.color.green,null))
+                currentBikeLocationMarker.remove()
+                currentbikeMarkerPresent = false
+            }
+
+
         }
 
         requireActivity().findViewById<Button>(R.id.buttonFavourites)?.setOnClickListener {
@@ -618,15 +682,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
     private fun bikeRouteList(){
         bikeRoute = ArrayList()
-
-
         val bikeTrail = (activity as CoreActivity).bikeTrail
         val reg = "(\\[\\D?\\d*.\\d*, \\D?\\d*.\\d*\\])".toRegex()
-        for(i in bikeTrail) {
+        for(i in bikeTrail){
             val matches = reg.findAll(i.javaClass.getMethod("getGeom").invoke(i).toString())
-            val latLngs = matches.map { it.value }.toList()
-            val singleBikeRoute: ArrayList<LatLng> = ArrayList()
-            for (j in latLngs) {
+            val latLngs = matches.map{it.value}.toList()
+            val singleBikeRoute:ArrayList<LatLng> = ArrayList()
+            for(j in latLngs){
 //                println("debug: j is ${j}")
                 val (long, lat) = j.drop(1).dropLast(1).split(", ")
 
@@ -636,11 +698,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         }
     }
 
-    /*
-    Upon location change:
-    1) Center map
-    2) Update location marker
-     */
+
     override fun onLocationChanged(location: Location) {
         val lat = location.latitude
         val lng = location.longitude

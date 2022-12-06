@@ -23,18 +23,21 @@
         android:roundIcon="@mipmap/ic_logo_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Minerva"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        >
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
-            android:label="@string/title_activity_settings">
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".ui.profile.EditProfileActivity"
-            android:exported="false">
+            android:exported="false"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -45,10 +48,12 @@
         <activity
             android:name=".CoreActivity"
             android:exported="false"
-            android:label="@string/title_activity_core" />
+            android:label="@string/title_activity_core"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".BikeRegisterActivity"
-            android:exported="false">
+            android:exported="false"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -56,7 +61,8 @@
         <activity
             android:name=".SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.Splash">
+            android:theme="@style/Theme.Splash"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -88,19 +94,24 @@
         <activity
             android:name=".BikeMapActivity"
             android:exported="false"
-            android:label="@string/title_activity_bike_map" />
+            android:label="@string/title_activity_bike_map"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".FavouritePoiActivity"
             android:exported="false"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MapsActivity"
             android:exported="false"
-            android:label="@string/title_activity_maps" />
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait"/>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="Minerva"
@@ -108,8 +119,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource ="@xml/file_paths"
-                />
+                android:resource="@xml/file_paths" />
         </provider>
     </application>
 
