@@ -35,7 +35,6 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
-import io.ktor.utils.io.concurrent.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -445,6 +444,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
             viewModel.insertBikeUsage(bikeUsage)
         }
+
+        Toast.makeText(
+            requireActivity(),
+            "Saved biking event",
+            Toast.LENGTH_SHORT
+        ).show()
 
         removeCurrentBikeUsage()
     }
