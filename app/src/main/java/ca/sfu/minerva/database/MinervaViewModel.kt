@@ -6,7 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
@@ -57,6 +60,19 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
     fun deleteFavouriteLocation(data: FavouriteLocation){
         repository.deleteFavouriteLocation(data)
     }
+
+    fun getBikeUsageAverageSpeed(): Double{
+        return repository.getBikeUsageAverageSpeed()
+    }
+
+    fun getBikeUsageTotalDistance(): Double{
+        return repository.getBikeUsageTotalDistance()
+    }
+
+    fun getBikeUsageTopSpeed(): Double {
+        return repository.getBikeUsageTopSpeed()
+    }
+
 
 }
 
