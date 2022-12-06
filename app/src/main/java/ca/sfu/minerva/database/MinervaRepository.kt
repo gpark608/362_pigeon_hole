@@ -122,6 +122,30 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
         return result
     }
 
+    fun getBikeUsageTopSpeed(): Double{
+        var result: Double = 0.0
+        CoroutineScope(IO).launch {
+            result = databaseDao.getBikeUsageTopSpeed()
+        }
+        return result
+    }
+
+    fun getBikeUsageAverageSpeed(): Double{
+        var result: Double = 0.0
+        CoroutineScope(IO).launch {
+            result = databaseDao.getBikeUsageAverageSpeed()
+        }
+        return result
+    }
+
+    fun getBikeUsageTotalDistance(): Double{
+        var result: Double = 0.0
+        CoroutineScope(IO).launch {
+            result = databaseDao.getBikeUsageTotalDistance()
+        }
+        return result
+    }
+
     //----------------
     fun deleteFavouriteLocation(data: FavouriteLocation){
         CoroutineScope(IO).launch {

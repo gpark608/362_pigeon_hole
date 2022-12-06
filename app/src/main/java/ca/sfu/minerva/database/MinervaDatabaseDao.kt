@@ -80,6 +80,16 @@ interface MinervaDatabaseDao {
     @Query("SELECT * FROM bike_usage_table WHERE id = :key")
     suspend fun getBikeUsageFromKey(key: Long) : BikeUsage
 
+    @Query("SELECT MAX(speed_column) FROM bike_usage_table")
+    suspend fun getBikeUsageTopSpeed() : Double
+
+    @Query("SELECT AVG(avg_speed_column) FROM bike_usage_table")
+    suspend fun getBikeUsageAverageSpeed() : Double
+
+    @Query("SELECT SUM(distance_column) FROM bike_usage_table")
+    suspend fun getBikeUsageTotalDistance() : Double
+
+
 //  -----
     @Query("DELETE FROM favourite_table WHERE name = :key")
     suspend fun deleteFavouriteLocationFromName(key: String): Void
