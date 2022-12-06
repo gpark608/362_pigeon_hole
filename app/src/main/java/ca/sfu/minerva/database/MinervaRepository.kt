@@ -125,7 +125,8 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
     fun getBikeUsageTopSpeed(): Double{
         var result: Double = 0.0
         CoroutineScope(IO).launch {
-            result = databaseDao.getBikeUsageTopSpeed()
+            if(databaseDao.getBikeUsageTopSpeed() != null)
+                result = databaseDao.getBikeUsageTopSpeed()
         }
         return result
     }
@@ -133,7 +134,8 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
     fun getBikeUsageAverageSpeed(): Double{
         var result: Double = 0.0
         CoroutineScope(IO).launch {
-            result = databaseDao.getBikeUsageAverageSpeed()
+            if(databaseDao.getBikeUsageAverageSpeed() != null)
+                result = databaseDao.getBikeUsageAverageSpeed()
         }
         return result
     }
@@ -141,7 +143,17 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
     fun getBikeUsageTotalDistance(): Double{
         var result: Double = 0.0
         CoroutineScope(IO).launch {
-            result = databaseDao.getBikeUsageTotalDistance()
+            if(databaseDao.getBikeUsageTotalDistance() != null)
+                result = databaseDao.getBikeUsageTotalDistance()
+        }
+        return result
+    }
+
+    fun getAllBiking(): Int {
+        var result: Int = 0
+        CoroutineScope(IO).launch {
+            if(databaseDao.getCountbiking() != null)
+                result = databaseDao.getCountbiking()
         }
         return result
     }
