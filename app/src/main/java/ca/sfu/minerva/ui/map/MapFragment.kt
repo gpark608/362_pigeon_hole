@@ -459,14 +459,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     }
 
     private fun startTrackingService(){
-        requireActivity().applicationContext.startForegroundService(trackingServiceIntent)
+        requireActivity().startService(trackingServiceIntent)
+//        requireActivity().applicationContext.startForegroundService(trackingServiceIntent)
         //ContextCompat.startForegroundService(requireActivity().applicationContext, trackingServiceIntent)
         requireActivity().applicationContext.bindService(trackingServiceIntent, trackingViewModel, Context.BIND_AUTO_CREATE)
 
         trackingViewModel.mapBundle.observe(viewLifecycleOwner){
             latestTrackingBundle = it
             Log.d("bike usage detail", "new bundle received")
-            Log.d("bike usage data", "$latestTrackingBundle")
         }
 
     }
@@ -478,10 +478,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
 
         if(latestTrackingBundle != null && !latestTrackingBundle!!.isEmpty()) {
-            Log.d("bike usage data", "outside coroutine: $latestTrackingBundle")
             CoroutineScope(IO).launch {
                 // save the current usage into db
-                Log.d("bike usage data", "inside coroutine: $latestTrackingBundle")
                 var bikeUsage = BikeUsage()
                 bikeUsage.climb = latestTrackingBundle!!.getDouble("currentAltitude")
                 bikeUsage.date = latestTrackingBundle!!.getString("date").toString()
@@ -490,9 +488,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 bikeUsage.avgSpeed = latestTrackingBundle!!.getFloat("avgSpeed").toDouble()
                 bikeUsage.time = latestTrackingBundle!!.getString("startTime").toString()
                 bikeUsage.speed = latestTrackingBundle!!.getFloat("speed").toDouble()
-
-                Log.d("bike usage detail", "$bikeUsage")
-
 
                 var tempArr = ArrayList<LatLng>()
 
@@ -506,7 +501,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 bikeUsage.locationList = tempArr
 
                 viewModel.insertBikeUsage(bikeUsage)
-                Log.d("size of db", "${repository.getBikeUsage(2)}")
                 latestTrackingBundle!!.clear()
             }
 
