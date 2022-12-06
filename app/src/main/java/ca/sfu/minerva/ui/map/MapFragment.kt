@@ -100,7 +100,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     private lateinit var buttonTracking: Button
     private lateinit var trackingServiceIntent: Intent
     private lateinit var trackingViewModel: TrackingViewModel
-    private lateinit var latestTrackingBundle: Bundle
+    private var latestTrackingBundle: Bundle? = null
 
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -410,8 +410,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         trackingViewModel.mapBundle.observe(viewLifecycleOwner){
             latestTrackingBundle = it
-
-            drawCurrentBikeUsage()
         }
 
     }
@@ -420,46 +418,39 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         requireActivity().applicationContext.unbindService(trackingViewModel)
         requireActivity().applicationContext.stopService(trackingServiceIntent)
 
-        CoroutineScope(IO).launch {
-            // save the current usage into db
-            var bikeUsage = BikeUsage()
-            bikeUsage.climb = latestTrackingBundle.getFloat("currentAltitude").toDouble()
-            bikeUsage.date = latestTrackingBundle.getFloat("date").toString()
-            bikeUsage.duration = latestTrackingBundle.getDouble("elapsedTime").toString()
-            bikeUsage.distance = latestTrackingBundle.getDouble("elapsedDistance")
-            bikeUsage.avgSpeed = latestTrackingBundle.getDouble("avgSpeed")
-            bikeUsage.time = latestTrackingBundle.getDouble("startTime").toString()
+        if(latestTrackingBundle != null) {
 
-            var tempArr = ArrayList<LatLng>()
+            CoroutineScope(IO).launch {
+                // save the current usage into db
+                var bikeUsage = BikeUsage()
+                bikeUsage.climb = latestTrackingBundle!!.getFloat("currentAltitude").toDouble()
+                bikeUsage.date = latestTrackingBundle!!.getFloat("date").toString()
+                bikeUsage.duration = latestTrackingBundle!!.getDouble("elapsedTime").toString()
+                bikeUsage.distance = latestTrackingBundle!!.getDouble("elapsedDistance")
+                bikeUsage.avgSpeed = latestTrackingBundle!!.getDouble("avgSpeed")
+                bikeUsage.time = latestTrackingBundle!!.getDouble("startTime").toString()
 
-            if(latestTrackingBundle.getParcelableArrayList<Location>("locations") != null) {
-                for (element in latestTrackingBundle.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
-                    tempArr.add(LatLng(element.latitude, element.longitude))
+                var tempArr = ArrayList<LatLng>()
+
+                if (latestTrackingBundle!!.getParcelableArrayList<Location>("locations") != null) {
+                    for (element in latestTrackingBundle!!.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
+                        tempArr.add(LatLng(element.latitude, element.longitude))
+                    }
+                } else {
+                    tempArr.add(LatLng(0.0, 0.0))
                 }
-            }
-            else{
-                tempArr.add(LatLng(0.0, 0.0))
-            }
-            bikeUsage.locationList = tempArr
+                bikeUsage.locationList = tempArr
 
-            viewModel.insertBikeUsage(bikeUsage)
+                viewModel.insertBikeUsage(bikeUsage)
+            }
+
+            Toast.makeText(
+                requireActivity(),
+                "Saved biking event",
+                Toast.LENGTH_SHORT
+            ).show()
+            latestTrackingBundle!!.clear()
         }
-
-        Toast.makeText(
-            requireActivity(),
-            "Saved biking event",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        removeCurrentBikeUsage()
-    }
-
-    private fun drawCurrentBikeUsage(){
-        // TODO: drawing on map the current service reading
-    }
-
-    private fun removeCurrentBikeUsage(){
-        latestTrackingBundle.clear()
     }
 
     private fun favouritesList(){
