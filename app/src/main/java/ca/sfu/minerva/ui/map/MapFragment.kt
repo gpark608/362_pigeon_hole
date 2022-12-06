@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 
-class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapLongClickListener {
+class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapLongClickListener{
 
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -159,6 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     }
 
     private fun onClickMarker(bikeRack: BikeRack) {
+        println("debug: bikeRack marker is clicked")
         val lat = bikeRack.position.latitude
         val lng = bikeRack.position.longitude
         clickedMarkerLocation = LatLng(lat, lng)
@@ -204,7 +205,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         sharedPreferences = requireActivity().getSharedPreferences("bikeLocation", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreferences.edit()
         val currentMarkerSharedPreference =sharedPreferences.getStringSet("latlng", setOf())
-        println("debug: currentMarkerSharedPreference ${currentMarkerSharedPreference}")
         if(!currentMarkerSharedPreference.isNullOrEmpty()){
             val lat = currentMarkerSharedPreference.elementAt(0).toDouble()
             val lng = currentMarkerSharedPreference.elementAt(1).toDouble()
@@ -224,9 +224,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mClusterManagerRecycleCenter = ClusterManager(activity, mMap)
         mClusterManagerBikeShop = ClusterManager(activity, mMap)
 
-
-//        mMap.setOnCameraIdleListener(mClusterManagerBikeRack)
-
+        mMap.setOnMarkerClickListener(mClusterManagerBikeRack)
+//        mMap.setOnCameraIdleListener(mClusterManagerRecycleCenter)
+//        mMap.setOnCameraIdleListener(mClusterManagerBikeShop)
         mMap.setOnCameraIdleListener {
 
             mClusterManagerBikeRack.cluster()
@@ -249,7 +249,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         bikeShopList()
         initLocationManager()
 
+        mClusterManagerBikeRack = ClusterManager(activity, mMap)
         mClusterManagerBikeRack.setOnClusterItemClickListener { item ->
+            println("debug: bike rack clicked")
             onClickMarker(item)
             false
         }
