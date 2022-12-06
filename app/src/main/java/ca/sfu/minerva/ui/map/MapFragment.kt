@@ -159,7 +159,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
     }
 
     private fun onClickMarker(bikeRack: BikeRack) {
-        println("debug: bikeRack marker is clicked")
+
         val lat = bikeRack.position.latitude
         val lng = bikeRack.position.longitude
         clickedMarkerLocation = LatLng(lat, lng)
@@ -251,7 +251,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         mClusterManagerBikeRack = ClusterManager(activity, mMap)
         mClusterManagerBikeRack.setOnClusterItemClickListener { item ->
-            println("debug: bike rack clicked")
             onClickMarker(item)
             false
         }
@@ -782,7 +781,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
             val latLngs = matches.map{it.value}.toList()
             val singleBikeRoute:ArrayList<LatLng> = ArrayList()
             for(j in latLngs){
-//                println("debug: j is ${j}")
                 val (long, lat) = j.drop(1).dropLast(1).split(", ")
 
                 singleBikeRoute.add(LatLng(lat.toDouble(), long.toDouble()))
