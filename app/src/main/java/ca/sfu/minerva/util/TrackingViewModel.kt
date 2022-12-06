@@ -18,13 +18,11 @@ class TrackingViewModel: ViewModel(), ServiceConnection {
         }
 
     override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
-        Log.d("DEBUG: ", "Service Connected")
         val trackingServiceBinder = iBinder as TrackingService.MyBinder
         trackingServiceBinder.setMsgHandler(mapDataHandler)
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
-        Log.d("DEBUG: ", "Service Disconnected")
     }
 
     inner class MapDataHandler(looper: Looper): Handler(looper) {

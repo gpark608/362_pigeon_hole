@@ -9,7 +9,7 @@ import androidx.room.TypeConverters
 @Database(entities = [
     RecyclingCenter::class, EcoStore::class, BikeRentalPlace::class, BikeTrail::class,
     BikeRepairShop::class, BikeLocation::class, FavouriteLocation::class, BikeUsage::class
-                     ], version = 5
+                     ], version = 8
 )
 @TypeConverters(MinervaDataConverter::class)
 abstract class MinervaDatabase : RoomDatabase() {

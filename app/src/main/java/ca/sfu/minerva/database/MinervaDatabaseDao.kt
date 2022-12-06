@@ -90,7 +90,7 @@ interface MinervaDatabaseDao {
     suspend fun getBikeUsageTotalDistance() : Double
 
     @Query("SELECT Count(*) FROM bike_usage_table")
-    suspend fun getCountbiking(): Int
+    suspend fun getBikeUsageCounting(): Int
 
 //  -----
     @Query("DELETE FROM favourite_table WHERE name = :key")

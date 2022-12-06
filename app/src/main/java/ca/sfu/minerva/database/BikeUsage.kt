@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.android.gms.maps.model.LatLng
 
-@TypeConverters(LocationConverter::class)
+//@TypeConverters(LocationConverter::class)
 @Entity(tableName = "bike_usage_table")
 data class BikeUsage (
     @PrimaryKey(autoGenerate = true)
@@ -33,6 +33,6 @@ data class BikeUsage (
     @ColumnInfo(name = "speed_column")
     var speed:Double = 0.0,
 
-    @ColumnInfo(name = "location_list_column")
-    var locationList: ArrayList<LatLng> = ArrayList()
-): java.io.Serializable
+//    @ColumnInfo(name = "location_list_column")
+//    var locationList: ArrayList<LatLng> = ArrayList()
+)//: java.io.Serializable

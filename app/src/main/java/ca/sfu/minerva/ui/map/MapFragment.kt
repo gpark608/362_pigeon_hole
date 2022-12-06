@@ -141,10 +141,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         viewModelFactory = MinervaViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory)[MinervaViewModel::class.java]
 
-
-
-
-
         // Favourite POI initializations
         poiDataList = ArrayList()
         poiMarkers = ArrayList()
@@ -371,13 +367,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         buttonTracking.setOnClickListener {
             if(!viewModel.bikeTrackingToggle){
                 startTrackingService()
-                Log.d("tracking", "Tracking status: started")
                 buttonTracking.text = "Stop Tracking"
             }
             else {
                 // Turning off the service
                 stopTrackingService()
-                Log.d("tracking", "Tracking status: stopped")
                 buttonTracking.text = "Start Tracking"
             }
 
@@ -460,23 +454,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
     private fun startTrackingService(){
         requireActivity().startService(trackingServiceIntent)
-//        requireActivity().applicationContext.startForegroundService(trackingServiceIntent)
-        //ContextCompat.startForegroundService(requireActivity().applicationContext, trackingServiceIntent)
         requireActivity().applicationContext.bindService(trackingServiceIntent, trackingViewModel, Context.BIND_AUTO_CREATE)
 
         trackingViewModel.mapBundle.observe(viewLifecycleOwner){
             latestTrackingBundle = it
-            Log.d("bike usage detail", "new bundle received")
         }
 
     }
 
     private fun stopTrackingService(){
-        requireActivity().applicationContext.unbindService(trackingViewModel)
-        requireActivity().applicationContext.stopService(trackingServiceIntent)
-
-
-
         if(latestTrackingBundle != null && !latestTrackingBundle!!.isEmpty()) {
             CoroutineScope(IO).launch {
                 // save the current usage into db
@@ -489,19 +475,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 bikeUsage.time = latestTrackingBundle!!.getString("startTime").toString()
                 bikeUsage.speed = latestTrackingBundle!!.getFloat("speed").toDouble()
 
-                var tempArr = ArrayList<LatLng>()
-
-                if (latestTrackingBundle!!.getParcelableArrayList<Location>("locations") != null) {
-                    for (element in latestTrackingBundle!!.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
-                        tempArr.add(LatLng(element.latitude, element.longitude))
-                    }
-                } else {
-                    tempArr.add(LatLng(0.0, 0.0))
-                }
-                bikeUsage.locationList = tempArr
+//                var tempArr = ArrayList<LatLng>()
+//                if (latestTrackingBundle!!.getParcelableArrayList<Location>("locations") != null) {
+//                    for (element in latestTrackingBundle!!.getParcelableArrayList<Location>("locations") as ArrayList<Location>) {
+//                        tempArr.add(LatLng(element.latitude, element.longitude))
+//                    }
+//                } else {
+//                    tempArr.add(LatLng(0.0, 0.0))
+//                }
+//                bikeUsage.locationList = tempArr
 
                 viewModel.insertBikeUsage(bikeUsage)
-                latestTrackingBundle!!.clear()
             }
 
             Toast.makeText(
@@ -510,6 +494,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 Toast.LENGTH_SHORT
             ).show()
         }
+        requireActivity().applicationContext.unbindService(trackingViewModel)
+        requireActivity().applicationContext.stopService(trackingServiceIntent)
     }
 
     private fun favouritesList(){
@@ -641,8 +627,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                         descriptionResult = commentInput.text.toString()
                     fav.description = descriptionResult
 
-                    viewModel.insertFavouriteLocation(fav)
 
+                    viewModel.insertFavouriteLocation(fav)
 
                     mMap.addMarker(poiMarkerOption.title(fav.name).position(latLng))
 

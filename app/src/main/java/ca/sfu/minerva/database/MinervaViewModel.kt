@@ -1,6 +1,7 @@
 package ca.sfu.minerva.database
 
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -68,8 +69,8 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
         return repository.getBikeUsageTopSpeed()
     }
 
-    fun getBikingUsageEventsCount(): Int{
-        return repository.getAllBiking()
+    fun getBikeUsageCounting(): Int{
+        return repository.getBikeUsageCounting()
     }
 
 
