@@ -477,19 +477,19 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
 
 
-        if(latestTrackingBundle != null) {
+        if(latestTrackingBundle != null && !latestTrackingBundle!!.isEmpty()) {
+            Log.d("bike usage data", "outside coroutine: $latestTrackingBundle")
             CoroutineScope(IO).launch {
                 // save the current usage into db
-                val temp = latestTrackingBundle
-                Log.d("bike usage data", "using the temp: $temp")
+                Log.d("bike usage data", "inside coroutine: $latestTrackingBundle")
                 var bikeUsage = BikeUsage()
-                bikeUsage.climb = temp!!.getFloat("currentAltitude").toDouble()
-                bikeUsage.date = temp!!.getFloat("date").toString()
-                bikeUsage.duration = temp!!.getDouble("elapsedTime").toString()
-                bikeUsage.distance = temp!!.getDouble("elapsedDistance")
-                bikeUsage.avgSpeed = temp!!.getDouble("avgSpeed")
-                bikeUsage.time = temp!!.getDouble("startTime").toString()
-                bikeUsage.speed = temp!!.getDouble("speed")
+                bikeUsage.climb = latestTrackingBundle!!.getDouble("currentAltitude")
+                bikeUsage.date = latestTrackingBundle!!.getString("date").toString()
+                bikeUsage.duration = latestTrackingBundle!!.getFloat("elapsedTime").toString()
+                bikeUsage.distance = latestTrackingBundle!!.getFloat("elapsedDistance").toDouble()
+                bikeUsage.avgSpeed = latestTrackingBundle!!.getFloat("avgSpeed").toDouble()
+                bikeUsage.time = latestTrackingBundle!!.getString("startTime").toString()
+                bikeUsage.speed = latestTrackingBundle!!.getFloat("speed").toDouble()
 
                 Log.d("bike usage detail", "$bikeUsage")
 
@@ -506,6 +506,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 bikeUsage.locationList = tempArr
 
                 viewModel.insertBikeUsage(bikeUsage)
+                Log.d("size of db", "${repository.getBikeUsage(2)}")
                 latestTrackingBundle!!.clear()
             }
 
