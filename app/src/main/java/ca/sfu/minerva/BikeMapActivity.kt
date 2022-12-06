@@ -110,9 +110,9 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback  {
         mClusterManager = ClusterManager(this, mMap)
         mMap.setOnCameraIdleListener(mClusterManager);
 
-        fakeBikeRackList()
-        fakeBikeTheftList()
-        fakeBikeRouteList()
+//        fakeBikeRackList()
+//        fakeBikeTheftList()
+//        fakeBikeRouteList()
 
         addBikeRacks()
         addBikeTheft()
@@ -203,7 +203,7 @@ class BikeMapActivity: AppCompatActivity(), OnMapReadyCallback  {
         bikeRacks = ArrayList()
         for (i in 0..9) {
             val latLng = LatLng((49.267502010791375 + i * 0.001 * (0..5).random()), (-123.00311497930385 + i * 0.001 * (0..5).random()))
-            bikeRacks.add(BikeRack(latLng, "", ""))
+            bikeRacks.add(BikeRack(latLng, "", "", 0))
         }
     }
 

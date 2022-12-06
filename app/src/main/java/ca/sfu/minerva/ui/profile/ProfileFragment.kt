@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import ca.sfu.minerva.MainActivity
 import ca.sfu.minerva.R
+import ca.sfu.minerva.SettingsActivity
 import ca.sfu.minerva.databinding.FragmentProfileBinding
 import ca.sfu.minerva.util.Helper
 import ca.sfu.minerva.util.getBitmap
@@ -34,6 +35,7 @@ class ProfileFragment : Fragment() {
     private lateinit var textFullName: TextView
     private lateinit var btnLogOut: TextView
     private lateinit var btnEdit: Button
+    private lateinit var btnSettings: TextView
     private lateinit var profilePictureUri: Uri
     private lateinit var defaultProfilePicture: Drawable
 
@@ -55,6 +57,9 @@ class ProfileFragment : Fragment() {
 
         btnEdit = root.findViewById(R.id.button_edit)
         btnEdit.setOnClickListener { onClickEditProfile() }
+
+        btnSettings = root.findViewById(R.id.text_settings)
+        btnSettings.setOnClickListener { onClickSettings() }
 
         btnLogOut = root.findViewById(R.id.text_logout)
         btnLogOut.setOnClickListener { onClickLogOut() }
@@ -102,6 +107,11 @@ class ProfileFragment : Fragment() {
 
     private fun onClickEditProfile() {
         val intent = Intent(activity, EditProfileActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun onClickSettings() {
+        val intent = Intent(activity, SettingsActivity::class.java)
         startActivity(intent)
     }
 
