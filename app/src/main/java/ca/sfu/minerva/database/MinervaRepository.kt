@@ -1,5 +1,6 @@
 package ca.sfu.minerva.database
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -149,11 +150,11 @@ class MinervaRepository(private val databaseDao : MinervaDatabaseDao) {
         return result
     }
 
-    fun getAllBiking(): Int {
+    fun getBikeUsageCounting(): Int {
         var result: Int = 0
         CoroutineScope(IO).launch {
-            if(databaseDao.getCountbiking() != null)
-                result = databaseDao.getCountbiking()
+            if(databaseDao.getBikeUsageCounting() != null)
+                result = databaseDao.getBikeUsageCounting()
         }
         return result
     }

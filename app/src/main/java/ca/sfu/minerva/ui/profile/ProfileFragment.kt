@@ -158,7 +158,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun loadUserStats(){
-        var eventCount = viewModel.getBikingUsageEventsCount()
+        var eventCount = viewModel.getBikeUsageCounting()
         var avgSpeed = viewModel.getBikeUsageAverageSpeed().toFloat()
         var totalDist = viewModel.getBikeUsageTotalDistance().toFloat()
         var topSpeed = viewModel.getBikeUsageTopSpeed().toFloat()
@@ -175,7 +175,6 @@ class ProfileFragment : Fragment() {
         topSpeedText.text = "Top Speed: ${formatStat( topSpeed )}"
         totalCaloriesText.text = "Total Calories Burned: ${totalCals}"
         bikingPoints.text = "Biking Points: ${points}"
-        Log.d("usage count", "Count: ${eventCount}")
     }
 
     private fun formatStat(number: Float): String{
