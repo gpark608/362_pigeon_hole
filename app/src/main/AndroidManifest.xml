@@ -96,12 +96,6 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
-        <activity
-            android:name=".BikeMapActivity"
-            android:exported="false"
-            android:label="@string/title_activity_bike_map"
-            android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
             android:exported="false"

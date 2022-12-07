@@ -31,7 +31,6 @@ class TrackingService: Service(), LocationListener {
     private lateinit var notificationManager: NotificationManager
     private val CHANNEL_ID =  "channel id for Bike Usage Tracking"
     private val NOTIFICATION_ID = 57
-    private val REQUEST_CODE = 11
     private lateinit var mapBinder: Binder
     private lateinit var customBroadcastReceiver: BroadcastReceiver
     companion object{
@@ -57,7 +56,7 @@ class TrackingService: Service(), LocationListener {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         showNotification()
 
-        customBroadcastReceiver = CustomBrodcastReceiver()
+        customBroadcastReceiver = CustomBroadcastReceiver()
         val intentFilter = IntentFilter()
         intentFilter.addAction(STOP_ACTION)
         registerReceiver(customBroadcastReceiver, intentFilter)
@@ -127,7 +126,7 @@ class TrackingService: Service(), LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
-        if(!_lastLocationArray.isEmpty())
+        if(_lastLocationArray.isNotEmpty())
             _elapsedDistance += location.distanceTo(_lastLocationArray.last())*0.001F
         else
             _initialAltitude = location.altitude
@@ -152,18 +151,12 @@ class TrackingService: Service(), LocationListener {
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
             intent.putExtra("activityFromActiveService", true)
 
-//            val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(temp).run {
-//                addNextIntentWithParentStack(intent)
-//                getPendingIntent(REQUEST_CODE, PendingIntent.FLAG_UPDATE_CURRENT and PendingIntent.FLAG_IMMUTABLE)
-//            }
-
             val notificationBuilder : NotificationCompat.Builder = NotificationCompat.Builder(
                 temp, CHANNEL_ID
             )
             notificationBuilder.setContentTitle("Minerva")
-            notificationBuilder.setContentText("Tracking current bike ride")
+            notificationBuilder.setContentText("Tracking Current Bike Ride")
             notificationBuilder.setSmallIcon(R.drawable.splash_screen)
-//            notificationBuilder.setContentIntent(resultPendingIntent)
             notificationBuilder.setOngoing(true)
             val notification = notificationBuilder.build()
 
@@ -239,14 +232,10 @@ class TrackingService: Service(), LocationListener {
         fun setMsgHandler(handler: Handler){
             msgHandler = handler
         }
-
-        fun getNotificationId(): Int{
-            return NOTIFICATION_ID
-        }
     }
 
 
-    inner class CustomBrodcastReceiver: BroadcastReceiver(){
+    inner class CustomBroadcastReceiver: BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             unregisterReceiver(customBroadcastReceiver)
             notificationManager.cancel(NOTIFICATION_ID)

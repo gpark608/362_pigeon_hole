@@ -3,13 +3,9 @@ package ca.sfu.minerva
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
-import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.location.*
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -17,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.ActivityFavouritePoiBinding
-import ca.sfu.minerva.ui.map.MapViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -26,11 +21,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.*
-import kotlin.collections.ArrayList
 
 class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, LocationListener {
     private lateinit var binding: ActivityFavouritePoiBinding
-    private lateinit var prefs: SharedPreferences
     private lateinit var mMap: GoogleMap
     private lateinit var poiMarkerOption: MarkerOptions
     private lateinit var poiOptionListView: ListView
@@ -58,7 +51,6 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
             .findFragmentById(R.id.POIMap) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        //prefs = this.getSharedPreferences(R.string.shared_preference_key.toString(), Context.MODE_PRIVATE)
         optionList = ArrayList()
         poiOptionListView = findViewById(R.id.poiListView)
         poiListAdapter = PoiListAdapter(this, optionList)
@@ -90,7 +82,7 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         poiMarker = mMap.addMarker(poiMarkerOption)!!
         poiMarker.remove()
 
-        poiOptionListView.setOnItemClickListener { parent, view, position, id ->
+        poiOptionListView.setOnItemClickListener { _, _, position, _ ->
             val fav = poiListAdapter.getItem(position)
             dropPoiPin(fav)
 
@@ -112,7 +104,7 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
     }
 
 
-    fun dropPoiPin(fav: FavouriteLocation){
+    private fun dropPoiPin(fav: FavouriteLocation){
         val poiLatLng = getLatLang(fav)
         poiMarkerOption.title(fav.name).position(poiLatLng)
 
@@ -127,7 +119,7 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         showAlertDialog(latLng)
     }
 
-    fun showAlertDialog(latLng: LatLng) {
+    private fun showAlertDialog(latLng: LatLng) {
         val alertDialog: AlertDialog? = this.let {
             var customLayout: LinearLayout = LinearLayout(this)
             customLayout.orientation = LinearLayout.VERTICAL
@@ -191,7 +183,7 @@ class FavouritePoiActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.
         // Not needed
     }
 
-    fun getLatLang(fav: FavouriteLocation): LatLng{
+    private fun getLatLang(fav: FavouriteLocation): LatLng{
         var favLatLng = LatLng(
             fav.favLatLng.substringBefore(',').toDouble(),
             fav.favLatLng.substringAfter(',').toDouble()
