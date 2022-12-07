@@ -128,8 +128,9 @@ class HomeFragment : Fragment(), LocationListener {
 
     private fun promptBikeRegistration() {
         val isBikeRegistered = sharedPreferences.getBoolean("registered", false)
+        val promptCount = sharedPreferences.getInt("count", 0)
 
-        if (!isBikeRegistered) {
+        if (!isBikeRegistered && promptCount == 0) {
             val intent = Intent(requireContext(), BikeRegisterActivity::class.java)
             startActivity(intent)
         }

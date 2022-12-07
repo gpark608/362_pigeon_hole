@@ -14,7 +14,6 @@ class SettingsActivity : AppCompatActivity() {
 
     companion object {
         const val PROJECT_529_KEY = "project529"
-        const val CHANGE_BACKGROUND_KEY = "background"
         const val MEASURE_KEY = "units_of_measure"
         const val WEIGHT_KEY = "units_of_weight"
     }
@@ -51,7 +50,6 @@ class SettingsActivity : AppCompatActivity() {
         private lateinit var measureUnitPreference: ListPreference
         private lateinit var weightUnitPreference: ListPreference
         private lateinit var btnProject529: Preference
-        private lateinit var btnChangeBackground: Preference
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -66,12 +64,6 @@ class SettingsActivity : AppCompatActivity() {
             btnProject529.setOnPreferenceClickListener {
                 val intent = Intent(requireContext(), BikeRegisterActivity::class.java)
                 startActivity(intent)
-                true
-            }
-
-            btnChangeBackground = findPreference(CHANGE_BACKGROUND_KEY)!!
-            btnChangeBackground.setOnPreferenceClickListener {
-                println("Place Holder")
                 true
             }
         }

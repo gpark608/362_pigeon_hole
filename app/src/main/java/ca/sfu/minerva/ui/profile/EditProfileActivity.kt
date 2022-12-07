@@ -30,6 +30,7 @@ import ca.sfu.minerva.*
 import ca.sfu.minerva.util.getBitmap
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textfield.TextInputLayout
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -45,6 +46,7 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var editTextProvince: EditText
     private lateinit var editTextGender: EditText
     private lateinit var editTextWeight: EditText
+    private lateinit var editTextFieldWeight: TextInputLayout
     private lateinit var editTextBirthdate: EditText
     private lateinit var imageViewProfilePicture: ShapeableImageView
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
@@ -89,9 +91,11 @@ class EditProfileActivity : AppCompatActivity() {
         editTextProvince = this.findViewById(R.id.edit_text_province)
         editTextGender = this.findViewById(R.id.edit_text_gender)
         editTextWeight = this.findViewById(R.id.edit_text_weight)
+        editTextFieldWeight = this.findViewById(R.id.text_field_weight)
         editTextBirthdate = this.findViewById(R.id.edit_text_birthdate)
 
         loadUserData()
+        setWeightUnits()
 
         cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
         { result: ActivityResult ->
@@ -143,6 +147,16 @@ class EditProfileActivity : AppCompatActivity() {
         }
         imageViewProfilePicture.setOnClickListener {
             onClickEdit()
+        }
+    }
+
+    private fun setWeightUnits() {
+        val unit = sharedPreferences.getString("units_of_weight", "Kg")
+
+        if (unit == "Lbs") {
+            editTextFieldWeight.hint = resources.getString(R.string.weight_lb)
+        } else {
+            editTextFieldWeight.hint = resources.getString(R.string.weight_kg)
         }
     }
 
