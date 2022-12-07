@@ -279,6 +279,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
 
                 startActivity(Intent.createChooser(sharingIntent, "Share via"))
+            } else {
+                Toast.makeText(requireContext(), "Select A Bike Rack Marker", Toast.LENGTH_SHORT).show()
             }
         }
 
