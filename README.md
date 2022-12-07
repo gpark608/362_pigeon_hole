@@ -48,10 +48,7 @@ To run the code, developer will need to insert their own Google Maps API key in 
 - [Figma UI Prototype](https://www.figma.com/file/9ILPvQGKsHmVdF4Zm7zypP/CMPT-362-App-Design?node-id=0%3A1)
 
 ## Team Effort Breakdown
--Linden Kyaw:
--Michael Park:
--Stella Tran:
--Balrick Gill:
+-[Notion for assigning tasks](https://www.notion.so/lkyaw/49460e948d2e42049efd430eaaff2fe6?v=3932f4a8d05b401fb2231c28732945a7)
 
 ## Diagrams
 MVVM Diagram 
