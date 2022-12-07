@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomSheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:behavior_hideable="false"
-    app:behavior_peekHeight="100dp"
+    app:behavior_peekHeight="135dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <LinearLayout
@@ -16,7 +15,17 @@
         app:layout_constraintTop_toTopOf="parent"
         >
 
+        <Button
+            android:id="@+id/button_tracking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center"
+            android:text="@string/start_recording"
+            app:layout_constraintBottom_toTopOf="@id/scroll_buttons"/>
+
         <HorizontalScrollView
+            android:id="@+id/scroll_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fillViewport="true"
@@ -110,9 +119,9 @@
                 android:id="@+id/view_line"
                 android:layout_width="40dp"
                 android:layout_height="3dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/drag_bar"
-                app:layout_constraintBottom_toTopOf="@id/text_title"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -127,9 +136,9 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/raisin_black"
+                app:layout_constraintTop_toBottomOf="@+id/view_line"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/text_address_label"
@@ -183,32 +192,35 @@
                 app:layout_constraintTop_toTopOf="@id/text_bike_racks_label" />
 
 
-            <ImageView
-                android:id="@+id/image_share"
-                android:layout_width="215dp"
-                android:layout_height="36dp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginTop="32dp"
-                android:background="@color/light_grey"
-                android:focusable="true"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_baseline_share_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_bike_racks" />
+                app:layout_constraintTop_toBottomOf="@id/text_bike_racks">
 
-            <TextView
-                android:id="@+id/saveBikeRack"
-                android:layout_width="197dp"
-                android:layout_height="37dp"
-                android:text="Save BikeRack as \nCurrent Location"
-                android:background="@color/light_grey"
-                android:gravity="center"
-                android:textColor="@color/green"
-                android:clickable="true"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text_bike_racks"
-                app:layout_constraintVertical_bias="1.0" />
+                <TextView
+                    android:id="@+id/saveBikeRack"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="@string/bike_parked_here"
+                    android:background="@color/light_grey"
+                    android:gravity="center"
+                    android:textColor="@color/green"
+                    android:clickable="true" />
+
+                <ImageView
+                    android:id="@+id/image_share"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@color/light_grey"
+                    android:focusable="true"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_baseline_share_24" />
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
