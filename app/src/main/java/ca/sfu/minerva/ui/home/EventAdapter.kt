@@ -6,12 +6,11 @@ import android.provider.CalendarContract
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import ca.sfu.minerva.R
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class EventAdapter (private val context: Context, var eventList: ArrayList<Event>) : BaseAdapter(){
@@ -30,7 +29,7 @@ class EventAdapter (private val context: Context, var eventList: ArrayList<Event
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = View.inflate(context, R.layout.event_adapter,null)
         val tvTitle = view.findViewById(R.id.tvTitle) as TextView
-        val btnAddToCalendar = view.findViewById(R.id.btnAddToCalendar) as Button
+        val btnAddToCalendar = view.findViewById(R.id.btnAddToCalendar) as ImageButton
         val tvDesc = view.findViewById(R.id.tvDesc) as TextView
         val tvDate = view.findViewById(R.id.tvDate) as TextView
         val tvLocation = view.findViewById(R.id.tvLocation) as TextView
