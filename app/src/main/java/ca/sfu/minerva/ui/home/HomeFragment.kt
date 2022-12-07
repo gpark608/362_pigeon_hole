@@ -2,6 +2,8 @@ package ca.sfu.minerva.ui.home
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Criteria
 import android.location.Location
@@ -52,6 +54,10 @@ class HomeFragment : Fragment(), LocationListener {
     private lateinit var adapter: EventAdapter
     private lateinit var locationManager: LocationManager
     private val apiKey: String = BuildConfig.W_API_KEY
+    private lateinit var btnChangeBackground: Button
+    private lateinit var sharedPref: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
+    private var background = 0
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -85,6 +91,30 @@ class HomeFragment : Fragment(), LocationListener {
         tvFullDate.text = getFullDate()
         ivWeatherIcon = binding.ivWeatherIcon
         container = binding.container
+        sharedPref = activity?.getSharedPreferences("background", MODE_PRIVATE)!!
+        background = sharedPref.getInt("background", 0)
+        editor = sharedPref.edit()
+        btnChangeBackground = binding.btnChangeBackground
+        btnChangeBackground.setOnClickListener {changeBackground()}
+        changeBackground()
+    }
+
+    private fun changeBackground() {
+        when(background){
+            0 -> {
+                container.setBackgroundResource(R.drawable.bg_two)
+                background = 1
+                editor.putInt("background", 1)
+                editor.apply()
+            }
+            1 -> {
+                container.setBackgroundResource(R.drawable.bg_one)
+                background = 0
+                editor.putInt("background", 0)
+                editor.apply()
+            }
+
+        }
     }
 
     private suspend fun getWeatherAPICall(latLng: LatLng){

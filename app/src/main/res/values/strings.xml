@@ -102,5 +102,6 @@
         <item>Lbs</item>
     </string-array>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="change_background">Change Background</string>
 
 </resources>
