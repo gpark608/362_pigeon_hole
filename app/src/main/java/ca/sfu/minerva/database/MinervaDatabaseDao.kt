@@ -89,7 +89,7 @@ interface MinervaDatabaseDao {
     @Query("SELECT SUM(distance_column) FROM bike_usage_table")
     suspend fun getBikeUsageTotalDistance() : Double
 
-    @Query("SELECT Count(*) FROM bike_usage_table")
+    @Query("SELECT Count(1) FROM bike_usage_table")
     suspend fun getBikeUsageCounting(): Int
 
 //  -----

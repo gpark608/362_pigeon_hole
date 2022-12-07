@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import ca.sfu.minerva.MainActivity
@@ -56,6 +57,13 @@ class ProfileFragment : Fragment() {
     private lateinit var viewModelFactory: MinervaViewModelFactory
     private lateinit var viewModel: MinervaViewModel
 
+    private var eventCount: Int = 0
+    private var avgSpeed = 0F
+    private var totalDist = 0F
+    private var topSpeed = 0F
+    private var totalCals = 0F
+    private var points: Int = 0
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -93,6 +101,7 @@ class ProfileFragment : Fragment() {
         viewModelFactory = MinervaViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory)[MinervaViewModel::class.java]
 
+        viewModel.allBikeUsageLiveData.observe(requireActivity(), Observer{})
         loadUserStats()
 
         return root
@@ -158,33 +167,36 @@ class ProfileFragment : Fragment() {
     }
 
     private fun loadUserStats(){
-        var eventCount = viewModel.getBikeUsageCounting()
-        var avgSpeed = viewModel.getBikeUsageAverageSpeed().toFloat()
-        var totalDist = viewModel.getBikeUsageTotalDistance().toFloat()
-        var topSpeed = viewModel.getBikeUsageTopSpeed().toFloat()
-        var totalCals = viewModel.getBikeUsageTotalDistance().toFloat()*62
+        CoroutineScope(IO).launch {
+            eventCount = viewModel.getBikeUsageCounting()
+            avgSpeed = viewModel.getBikeUsageAverageSpeed().toFloat()
+            totalDist = viewModel.getBikeUsageTotalDistance().toFloat()
+            topSpeed = viewModel.getBikeUsageTopSpeed().toFloat()
+            totalCals = viewModel.getBikeUsageTotalDistance().toFloat() * 62
+        }
 
-        var points = DecimalFormat("#####").format(
-            ((avgSpeed * totalDist) /eventCount).toFloat()
-        ).toString()
-        if(points.toDouble().isNaN())
-            points = "0"
+        if(eventCount == 0 || points.toDouble().isNaN() || !points.toDouble().isFinite())
+            points = 0
+        else
+            points = DecimalFormat("#####").format(
+                ((avgSpeed * totalDist) / eventCount).toFloat()
+            ).toInt()
 
-        averageSpeedText.text = "Average Speed: ${formatStat( avgSpeed )}"
-        totalDistanceText.text = "Total Distance: ${formatStat( totalDist)}"
-        topSpeedText.text = "Top Speed: ${formatStat( topSpeed )}"
-        totalCaloriesText.text = "Total Calories Burned: ${totalCals}"
+        averageSpeedText.text = "Average Speed: ${formatStat(avgSpeed)}"
+        totalDistanceText.text = "Total Distance: ${formatStat(totalDist)}"
+        topSpeedText.text = "Top Speed: ${formatStat(topSpeed)}"
+        totalCaloriesText.text = "Total Calories Burned: ${ DecimalFormat("##.##").format(totalCals) }"
         bikingPoints.text = "Biking Points: ${points}"
     }
 
     private fun formatStat(number: Float): String{
         var result: String =""
         if(sharedPreferences.getString("", "") == "")
-            result = DecimalFormat("##.##").format(number).toString() + " km/h"
+            result = DecimalFormat("##.##").format(number).toString() + " km"
         else
             result = DecimalFormat("##.##").format(
                 Helper.metersToMiles(number)
-            ).toString() + " m/h"
+            ).toString() + " m"
         return result
     }
 
