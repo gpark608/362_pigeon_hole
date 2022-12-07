@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
-        <!-- Profile Header Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,22 +80,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="0dp"
-                    android:text="@string/stats"
-                    android:paddingBottom="10dp"
+                    android:text="@string/all_time_stats"
+                    android:textSize="18dp"
+                    android:textColor="@color/raisin_black"
+                    android:textStyle="bold"
+                    android:paddingBottom="16dp"
                     />
-
-                <TextView
-                    android:id="@+id/textAverageSpeedStat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Average Speed:"
-                    android:paddingBottom="6dp"/>
 
                 <TextView
                     android:id="@+id/textTotalDistanceStat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total Distance:"
+                    android:paddingBottom="6dp"/>
+
+                <TextView
+                    android:id="@+id/textAverageSpeedStat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Average Speed:"
                     android:paddingBottom="6dp"/>
 
                 <TextView
@@ -120,65 +122,6 @@
                     android:text="Biking Points:" />
 
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            >
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:orientation="vertical"
-                >
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_margin="0dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/my_bikes"
-                    />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/light_grey"
-                    />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_margin="0dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/routes"
-                    />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/light_grey"
-                    />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_margin="0dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/favourite_locations"
-                    />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/light_grey"
-                    />
-            </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
