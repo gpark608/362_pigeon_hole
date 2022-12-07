@@ -44,7 +44,7 @@ To run the code, developer will need to insert their own Google Maps API key in 
 - [Original Pitch](https://youtu.be/Aw_1bwNVqXs)
 - [Show and Tell 1](https://youtu.be/SfIQu-84VoU)
 - [Show and Tell 2](https://youtu.be/dlCKKmbO34Q)
-- [Final Presentation]()
+- [Final Presentation](https://youtu.be/ZqzYK3JoGJo)
 
 #### Prototype
 - [Figma UI Prototype](https://www.figma.com/file/9ILPvQGKsHmVdF4Zm7zypP/CMPT-362-App-Design?node-id=0%3A1)
@@ -60,3 +60,9 @@ MVVM Diagram
 Thread Diagram 
 
 <img src = "https://github.com/gpark608/362_pigeon_hole/blob/main/diagrams/threadDiagram.png" width=50% height=50%>
+
+## Screenshots
+<img src = "https://github.com/gpark608/362_pigeon_hole/blob/main/screenshots/heatmap.PNG" width=50% height=50%>
+<img src = "https://github.com/gpark608/362_pigeon_hole/blob/main/screenshots/main.PNG" width=50% height=50%>
+<img src = "https://github.com/gpark608/362_pigeon_hole/blob/main/screenshots/map.PNG" width=50% height=50%>
+<img src = "https://github.com/gpark608/362_pigeon_hole/blob/main/screenshots/profile.PNG" width=50% height=50%>
