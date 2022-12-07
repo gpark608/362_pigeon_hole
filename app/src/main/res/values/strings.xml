@@ -21,6 +21,7 @@
 
     <!-- Map Fragment -->
     <string name="bike_parked_here">Bike Parked Here</string>
+    <string name="remove_parked_here">Remove Parked Location</string>
     <string name="start_recording">Start Recording</string>
 
     <!-- Shared Preference -->
