@@ -231,13 +231,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         }
 
-        mMap.setOnCameraMoveListener {
-            val zoomLevel = mMap.cameraPosition.zoom
-
-            if (bikeTheftsToggle && zoomLevel < 12) {
-                mOverlay.remove()
-            }
-        }
         bikeRackList()
         bikeTheftList()
         bikeRouteList()
@@ -417,16 +410,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         requireActivity().findViewById<Button>(R.id.buttonBikeTheft)?.setOnClickListener {
             onToggle(it as Button)
             if(!bikeTheftsToggle){
-                if(mMap.cameraPosition.zoom < 12){
-                    Toast.makeText(
-                        requireActivity(),
-                        "Need to Zoom in More", Toast.LENGTH_SHORT
-                    ).show()
-                }else{
-                    addBikeTheft()
-                    bikeTheftsToggle = true
-                }
-
+                addBikeTheft()
+                bikeTheftsToggle = true
             }else{
                 mOverlay.remove()
                 bikeTheftsToggle = false
