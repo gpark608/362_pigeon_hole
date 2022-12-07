@@ -169,7 +169,7 @@ class TrackingService: Service(), LocationListener {
 
 
             if(Build.VERSION.SDK_INT > 26){
-                val channel = NotificationChannel(CHANNEL_ID, "myruns channel", NotificationManager.IMPORTANCE_HIGH)
+                val channel = NotificationChannel(CHANNEL_ID, "minerva channel", NotificationManager.IMPORTANCE_HIGH)
                 notificationManager.createNotificationChannel(channel)
             }
 

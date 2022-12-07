@@ -182,21 +182,25 @@ class ProfileFragment : Fragment() {
                 ((avgSpeed * totalDist) / eventCount).toFloat()
             ).toInt()
 
-        averageSpeedText.text = "Average Speed: ${formatStat(avgSpeed)}"
-        totalDistanceText.text = "Total Distance: ${formatStat(totalDist)}"
-        topSpeedText.text = "Top Speed: ${formatStat(topSpeed)}"
+        averageSpeedText.text = "Average Speed: ${formatStat(avgSpeed, true)}"
+        totalDistanceText.text = "Total Distance: ${formatStat(totalDist, false)}"
+        topSpeedText.text = "Top Speed: ${formatStat(topSpeed, true)}"
         totalCaloriesText.text = "Total Calories Burned: ${ DecimalFormat("##.##").format(totalCals) }"
         bikingPoints.text = "Biking Points: ${points}"
     }
 
-    private fun formatStat(number: Float): String{
+    private fun formatStat(number: Float, needTime: Boolean): String{
         var result: String =""
-        if(sharedPreferences.getString("", "") == "")
+
+        if(sharedPreferences.getString("units_of_measure", "Metric") == "Metric")
             result = DecimalFormat("##.##").format(number).toString() + " km"
         else
             result = DecimalFormat("##.##").format(
-                Helper.metersToMiles(number)
+                number*0.621371
             ).toString() + " m"
+
+        if(needTime)
+            result += "/h"
         return result
     }
 
