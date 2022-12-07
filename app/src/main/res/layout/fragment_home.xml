@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_grey"
     tools:context=".ui.home.HomeFragment"
     android:id="@+id/container"
     android:orientation="vertical">
@@ -12,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/grey"
+        android:background="#4B000000"
         android:layout_marginBottom="15dp"
         >
 
@@ -77,18 +76,30 @@
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/change_background"
+            android:layout_marginBottom="5dp"
+            android:id="@+id/btnChangeBackground"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/light_grey"
+        android:background="#4B000000"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginBottom="24dp"
             android:text="@string/upcoming_events"
             android:textSize="18sp"
-            android:textColor="@color/raisin_black"
+            android:textColor="@color/white"
             android:textStyle="bold"
             >
 
@@ -98,6 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:textColor="@color/white"
             android:layout_marginBottom="14dp"
             android:text="@string/upcoming_events_desc"
             />

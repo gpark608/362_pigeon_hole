@@ -108,7 +108,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/unknown"
-        android:background="@color/white"
+        android:background="#A6FFFFFF"
         android:paddingTop="10dp"
         android:paddingStart="10dp"
         android:paddingBottom="6dp"
