@@ -19,6 +19,11 @@
     <string name="label_or">or</string>
     <string name="continue_as_guest">Continue as Guest</string>
 
+    <!-- Map Fragment -->
+    <string name="bike_parked_here">Bike Parked Here</string>
+    <string name="remove_parked_here">Remove Parked Location</string>
+    <string name="start_recording">Start Recording</string>
+
     <!-- Shared Preference -->
     <string name="shared_preference_key">shared_preference_key</string>
 
@@ -45,7 +50,7 @@
     <string name="routes">Routes</string>
     <string name="my_bikes">My Bikes</string>
     <string name="current_bike_stats">Current Bike Stats</string>
-    <string name="stats">Stats</string>
+    <string name="all_time_stats">All Time Stats</string>
     <string name="desc_profile_picture">Profile Picture</string>
     <string name="dummy_name">John Doe</string>
     <string name="unknown">N/A</string>

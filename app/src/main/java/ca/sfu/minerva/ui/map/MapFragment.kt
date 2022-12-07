@@ -9,7 +9,6 @@ import android.graphics.Color
 import android.location.*
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ca.sfu.minerva.CoreActivity
 import ca.sfu.minerva.R
-import ca.sfu.minerva.data.BikeShop
 import ca.sfu.minerva.database.*
 import ca.sfu.minerva.databinding.FragmentMapBinding
 import ca.sfu.minerva.util.TrackingService
@@ -33,7 +31,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.maps.android.clustering.ClusterManager
-import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.google.maps.android.heatmaps.WeightedLatLng
@@ -147,7 +144,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         buttonList = root.findViewById(R.id.buttonActivateList)
 
         // Tracking initializations
-        buttonTracking = root.findViewById(R.id.buttonTracking)
+        buttonTracking = root.findViewById(R.id.button_tracking)
         trackingViewModel = ViewModelProvider(this)[TrackingViewModel::class.java]
         trackingServiceIntent = Intent(requireActivity(), TrackingService::class.java)
         if(viewModel.bikeTrackingToggle)
@@ -195,7 +192,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
         mMap.setOnMapLongClickListener(this)
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.setPadding(0,600,0,800)
+        mMap.setPadding(0,600,0,1200)
 
         currentBikeLocationMarkerOption = MarkerOptions()
         currentBikeLocationMarkerOption.title("Current Bike Location")
@@ -282,6 +279,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
 
                 startActivity(Intent.createChooser(sharingIntent, "Share via"))
+            } else {
+                Toast.makeText(requireContext(), "Select A Bike Rack Marker", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -299,22 +298,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                     currentBikeLocationMarker = mMap.addMarker(currentBikeLocationMarkerOption)!!
                     currentBikeLocationMarker.zIndex = Float.MAX_VALUE
                     currentBikeLocationMarker.showInfoWindow()
-                    saveBikeRackTextView.text = "Remove Current Location"
-                    saveBikeRackTextView.setTextColor(Color.RED)
+                    saveBikeRackTextView.text = resources.getString(R.string.remove_parked_here)
+                    saveBikeRackTextView.setTextColor(resources.getColor(R.color.red_vermilion, null))
 
                     currentbikeMarkerPresent = true
 
                 }else{
                     editor.putStringSet("latlng", setOf())
-                    saveBikeRackTextView.text = "Save BikeRack as \nCurrent Location"
-                    saveBikeRackTextView.setTextColor(resources.getColor(R.color.green,null))
+                    saveBikeRackTextView.text = resources.getString(R.string.bike_parked_here)
+                    saveBikeRackTextView.setTextColor(resources.getColor(R.color.ocean_green,null))
                     currentBikeLocationMarker.remove()
                     currentbikeMarkerPresent = false
                 }
             }else if(!isBikeRackSelected && currentbikeMarkerPresent){
                 editor.putStringSet("latlng", setOf())
-                saveBikeRackTextView.text = "Save BikeRack as \nCurrent Location"
-                saveBikeRackTextView.setTextColor(resources.getColor(R.color.green,null))
+                saveBikeRackTextView.text = resources.getString(R.string.bike_parked_here)
+                saveBikeRackTextView.setTextColor(resources.getColor(R.color.ocean_green,null))
                 currentBikeLocationMarker.remove()
                 currentbikeMarkerPresent = false
             }
@@ -340,14 +339,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
             onToggle(it as Button)
-            val btnBikeTheft = requireActivity().findViewById<Button>(R.id.buttonBikeTheft)
-            // only allow the Bike Theft button to be toggled if the
-            // Bike Racks button is toggled and un-toggle Bike Theft
-            // button if toggled when Bike Racks button is toggled
-            btnBikeTheft.isEnabled = it.isSelected
-            if (!it.isSelected && btnBikeTheft.isSelected) {
-                btnBikeTheft.callOnClick()
-            }
 
             bikeRacksToggle = if(!bikeRacksToggle){
                 addBikeRacks()
