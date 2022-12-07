@@ -35,6 +35,7 @@ To run the code, developer will need to insert their own Google Maps API key in 
 ## Notes
 - Retrieving events from Firebase can take awhile
 - App is restricted in portrait mode
+- Build project with API level 29 or above
 
 
 ## Pitches And Presentation Videos
