@@ -337,14 +337,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
 
         requireActivity().findViewById<Button>(R.id.buttonBikeRacks)?.setOnClickListener {
             onToggle(it as Button)
-            val btnBikeTheft = requireActivity().findViewById<Button>(R.id.buttonBikeTheft)
-            // only allow the Bike Theft button to be toggled if the
-            // Bike Racks button is toggled and un-toggle Bike Theft
-            // button if toggled when Bike Racks button is toggled
-            btnBikeTheft.isEnabled = it.isSelected
-            if (!it.isSelected && btnBikeTheft.isSelected) {
-                btnBikeTheft.callOnClick()
-            }
 
             bikeRacksToggle = if(!bikeRacksToggle){
                 addBikeRacks()
