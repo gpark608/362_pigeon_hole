@@ -7,7 +7,7 @@
 
 
 ## APK Download
-[Download apk](insert hyperlink to that apk file)
+[Download apk](https://github.com/gpark608/362_pigeon_hole/blob/main/final_apk.zip)
 
 ## Overview
 Minerva is a mobile application for helping Vancouverites find relatively safe bike racks to store their bicycles by allowing them to view safe and unsafe bike racks.
