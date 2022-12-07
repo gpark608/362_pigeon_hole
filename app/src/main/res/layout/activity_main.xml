@@ -87,7 +87,7 @@
                 android:layout_weight="1"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="5dp"
-                android:background="@color/ghost_white"/>
+                android:background="@color/light_grey_alt"/>
 
             <TextView
                 android:id="@+id/or"
@@ -96,7 +96,7 @@
                 android:fontFamily="@font/roboto_medium"
                 android:text="@string/label_or"
                 android:textAllCaps="true"
-                android:textColor="@color/ghost_white"
+                android:textColor="@color/light_grey_alt"
                 tools:ignore="TextContrastCheck" />
 
             <View
@@ -106,7 +106,7 @@
                 android:layout_weight="1"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
-                android:background="@color/ghost_white"/>
+                android:background="@color/light_grey_alt"/>
 
         </LinearLayout>
 
@@ -117,7 +117,7 @@
             android:layout_marginTop="20dp"
             android:layout_gravity="center"
             android:fontFamily="@font/roboto_medium"
-            android:textColor="@color/ghost_white"
+            android:textColor="@color/light_grey_alt"
             android:text="@string/continue_as_guest"
             />
 

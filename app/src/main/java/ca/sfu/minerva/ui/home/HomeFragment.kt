@@ -3,6 +3,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Criteria
@@ -20,6 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import ca.sfu.minerva.BikeRegisterActivity
 import ca.sfu.minerva.BuildConfig
 import ca.sfu.minerva.R
 import ca.sfu.minerva.databinding.FragmentHomeBinding
@@ -42,6 +44,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 class HomeFragment : Fragment(), LocationListener {
     private var _binding: FragmentHomeBinding? = null
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var tvTemperature: TextView
     private lateinit var tvCity: TextView
     private lateinit var tvWeekday: TextView
@@ -71,6 +74,11 @@ class HomeFragment : Fragment(), LocationListener {
             ViewModelProvider(this).get(HomeViewModel::class.java)
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        // Use Shared Preferences to determine whether user is prompted to register with Project 529
+        sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
+        promptBikeRegistration()
+
         firestore = Firebase.firestore
         eventList = ArrayList()
         initializeTextViews()
@@ -82,6 +90,7 @@ class HomeFragment : Fragment(), LocationListener {
         }
         return root
     }
+
     private fun initializeTextViews() {
         tvTemperature = binding.tvTemperature
         tvCity = binding.tvCity
@@ -114,6 +123,15 @@ class HomeFragment : Fragment(), LocationListener {
                 editor.apply()
             }
 
+        }
+    }
+
+    private fun promptBikeRegistration() {
+        val isBikeRegistered = sharedPreferences.getBoolean("registered", false)
+
+        if (!isBikeRegistered) {
+            val intent = Intent(requireContext(), BikeRegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 
