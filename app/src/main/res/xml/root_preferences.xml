@@ -32,10 +32,5 @@
             app:summary="Register your bike with Project 529"
             app:title="Project 529" />
 
-        <Preference
-            app:iconSpaceReserved="false"
-            app:key="background"
-            app:title="Change Background" />
-
     </PreferenceCategory>
 </PreferenceScreen>
