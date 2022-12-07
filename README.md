@@ -30,11 +30,13 @@ Functionalities of the App include:
 To run the code, developer will need to insert their own Google Maps API key in local.properties
 
 ## User Logins
-(add more user login specifics, related to firestore)
+- can register with new account
+- can use admin account; username admin@gmail.com password: qwerty123
 
 ## Notes
 - Retrieving events from Firebase can take awhile
 - App is restricted in portrait mode
+- App needs wi-fi or mobile data to work
 - Build project with API level 29 or above
 
 
