@@ -34,6 +34,7 @@
                     android:textSize="14sp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
                     android:layout_weight="1"
                     android:textColor="@color/raisin_black"
                     android:text="@string/unknown"
@@ -110,7 +111,7 @@
         android:background="@color/white"
         android:paddingTop="10dp"
         android:paddingStart="10dp"
-        android:paddingBottom="5dp"
+        android:paddingBottom="6dp"
         android:textColor="@color/raisin_black"
         android:textStyle="bold"
         android:textSize="14sp" />
