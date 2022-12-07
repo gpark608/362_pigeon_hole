@@ -50,7 +50,7 @@
     <string name="routes">Routes</string>
     <string name="my_bikes">My Bikes</string>
     <string name="current_bike_stats">Current Bike Stats</string>
-    <string name="stats">Stats</string>
+    <string name="all_time_stats">All Time Stats</string>
     <string name="desc_profile_picture">Profile Picture</string>
     <string name="dummy_name">John Doe</string>
     <string name="unknown">N/A</string>
