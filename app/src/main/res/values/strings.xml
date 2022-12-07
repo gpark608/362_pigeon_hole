@@ -19,6 +19,10 @@
     <string name="label_or">or</string>
     <string name="continue_as_guest">Continue as Guest</string>
 
+    <!-- Home Fragment -->
+    <string name="upcoming_events">Upcoming Events</string>
+    <string name="upcoming_events_desc">Below you will find events organized by organizations, universities, and bike clubs.</string>
+
     <!-- Map Fragment -->
     <string name="bike_parked_here">Bike Parked Here</string>
     <string name="remove_parked_here">Remove Parked Location</string>
@@ -55,7 +59,6 @@
     <string name="dummy_name">John Doe</string>
     <string name="unknown">N/A</string>
     <string name="add_to_calendar">Add To Calendar</string>
-    <string name="upcoming_events">Upcoming Events:</string>
 
     <!-- Edit Profile Activity -->
     <string name="edit_profile">Edit Profile</string>
@@ -75,6 +78,7 @@
     <string name="prefer_not_to_say">Prefer Not To Say</string>
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
+
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
