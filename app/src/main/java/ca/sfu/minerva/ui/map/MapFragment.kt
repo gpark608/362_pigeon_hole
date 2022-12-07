@@ -309,6 +309,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                     saveBikeRackTextView.setTextColor(resources.getColor(R.color.ocean_green,null))
                     currentBikeLocationMarker.remove()
                     currentbikeMarkerPresent = false
+                    editor.apply()
                 }
             }else if(!isBikeRackSelected && currentbikeMarkerPresent){
                 editor.putStringSet("latlng", setOf())
@@ -316,6 +317,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                 saveBikeRackTextView.setTextColor(resources.getColor(R.color.ocean_green,null))
                 currentBikeLocationMarker.remove()
                 currentbikeMarkerPresent = false
+                editor.apply()
             }
 
 
