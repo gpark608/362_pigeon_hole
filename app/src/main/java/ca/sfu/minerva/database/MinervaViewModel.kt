@@ -57,19 +57,19 @@ class MinervaViewModel(private val repository: MinervaRepository): ViewModel(){
         repository.deleteFavouriteLocation(data)
     }
 
-    fun getBikeUsageAverageSpeed(): Double{
+    suspend fun getBikeUsageAverageSpeed(): Double{
         return repository.getBikeUsageAverageSpeed()
     }
 
-    fun getBikeUsageTotalDistance(): Double{
+    suspend fun getBikeUsageTotalDistance(): Double{
         return repository.getBikeUsageTotalDistance()
     }
 
-    fun getBikeUsageTopSpeed(): Double {
+    suspend fun getBikeUsageTopSpeed(): Double {
         return repository.getBikeUsageTopSpeed()
     }
 
-    fun getBikeUsageCounting(): Int{
+    suspend fun getBikeUsageCounting(): Int{
         return repository.getBikeUsageCounting()
     }
 
