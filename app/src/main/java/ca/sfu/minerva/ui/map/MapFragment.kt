@@ -297,21 +297,21 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                     currentBikeLocationMarker.zIndex = Float.MAX_VALUE
                     currentBikeLocationMarker.showInfoWindow()
                     saveBikeRackTextView.text = resources.getString(R.string.remove_parked_here)
-                    saveBikeRackTextView.setTextColor(Color.RED)
+                    saveBikeRackTextView.setTextColor(resources.getColor(R.color.red_vermilion, null))
 
                     currentbikeMarkerPresent = true
 
                 }else{
                     editor.putStringSet("latlng", setOf())
                     saveBikeRackTextView.text = resources.getString(R.string.bike_parked_here)
-                    saveBikeRackTextView.setTextColor(resources.getColor(R.color.green,null))
+                    saveBikeRackTextView.setTextColor(resources.getColor(R.color.ocean_green,null))
                     currentBikeLocationMarker.remove()
                     currentbikeMarkerPresent = false
                 }
             }else if(!isBikeRackSelected && currentbikeMarkerPresent){
                 editor.putStringSet("latlng", setOf())
                 saveBikeRackTextView.text = resources.getString(R.string.bike_parked_here)
-                saveBikeRackTextView.setTextColor(resources.getColor(R.color.green,null))
+                saveBikeRackTextView.setTextColor(resources.getColor(R.color.ocean_green,null))
                 currentBikeLocationMarker.remove()
                 currentbikeMarkerPresent = false
             }
