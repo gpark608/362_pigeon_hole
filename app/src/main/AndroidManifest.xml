@@ -101,17 +101,6 @@
             android:exported="false"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name=".FavouritePoiActivity"
-            android:exported="false"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".MapsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_maps"
-            android:screenOrientation="portrait"/>
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="Minerva"
