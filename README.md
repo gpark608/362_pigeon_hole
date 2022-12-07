@@ -55,8 +55,8 @@ To run the code, developer will need to insert their own Google Maps API key in 
 ## Diagrams
 MVVM Diagram 
 
-<img src = "" width=50% height=50%>
+<img src = "https://github.com/gpark608/362_pigeon_hole/blob/main/diagrams/MVVMDiagram.png" width=50% height=50%>
 
 Thread Diagram 
 
-<img src = "" width=50% height=50%>
+<img src = "https://github.com/gpark608/362_pigeon_hole/blob/main/diagrams/threadDiagram.png" width=50% height=50%>
