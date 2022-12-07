@@ -296,7 +296,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationListener, GoogleMap.
                     currentBikeLocationMarker = mMap.addMarker(currentBikeLocationMarkerOption)!!
                     currentBikeLocationMarker.zIndex = Float.MAX_VALUE
                     currentBikeLocationMarker.showInfoWindow()
-                    saveBikeRackTextView.text = resources.getString(R.string.bike_parked_here)
+                    saveBikeRackTextView.text = resources.getString(R.string.remove_parked_here)
                     saveBikeRackTextView.setTextColor(Color.RED)
 
                     currentbikeMarkerPresent = true
